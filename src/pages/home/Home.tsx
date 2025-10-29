@@ -1,6 +1,6 @@
-import HeroSection from "../../components/homecomponent/HeroSection";
-import NewModelSection from "../../components/homecomponent/NewModelSection";
-import TopSellingSection from "../../components/homecomponent/TopSellingSection";
+import HeroSection from "../../components/homeComponent/HeroSection";
+import NewModelSection from "../../components/homeComponent/NewModelSection";
+import TopSellingSection from "../../components/homeComponent/TopSellingSection";
 import MainLayout from "../../components/layout/MainLayout";
 function Home() {
   return (

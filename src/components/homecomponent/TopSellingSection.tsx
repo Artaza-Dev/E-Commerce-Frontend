@@ -3,13 +3,12 @@ import Button from "../ui/Button";
 import image1 from "../../assets/mobile3.jpg";
 import image3 from "../../assets/mobile5.jpg";
 import image4 from "../../assets/mobile6.jpg";
+interface CardItem {
+  image: string;
+  title: string;
+  price: number;
+}
 function TopSellingSection() {
-  interface CardItem {
-    image: string;
-    title: string;
-    price: number;
-  }
-
   const CardsData: CardItem[] = [
     {
       image: image1,

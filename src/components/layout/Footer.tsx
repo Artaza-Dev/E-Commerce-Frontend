@@ -6,7 +6,7 @@ import googlepay from "../../assets/googlePay.png";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-gray-50 text-gray-800">
+    <footer className="w-full bg-gray-50 text-">
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
         {/* --- Brand Section --- */}
         <div>
