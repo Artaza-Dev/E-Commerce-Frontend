@@ -1,14 +1,6 @@
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
-import {
-  faShoppingCart,
-  faUser,
-  faBars,
-  faHeart,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
-
+import { Heart, ShoppingCart, CircleUserRound, Menu,  X } from 'lucide-react';
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -53,7 +45,7 @@ function Navbar() {
               aria-label="Wishlist"
               className="p-2 hover:text-zinc-400 transition cursor-pointer"
             >
-              <FontAwesomeIcon icon={faHeart} />
+              <Heart />
             </NavLink>
 
             <NavLink
@@ -61,14 +53,14 @@ function Navbar() {
               aria-label="Shopping Cart"
               className="p-2 hover:text-zinc-400 transition cursor-pointer"
             >
-              <FontAwesomeIcon icon={faShoppingCart} />
+              <ShoppingCart />
             </NavLink>
 
             <button
               aria-label="User Account"
               className="p-2 hover:text-zinc-400 transition cursor-pointer"
             >
-              <FontAwesomeIcon icon={faUser} />
+              <CircleUserRound />
             </button>
 
             {/* Mobile Menu Button */}
@@ -77,7 +69,7 @@ function Navbar() {
               className="md:hidden p-2 hover:text-zinc-400 transition cursor-pointer"
               onClick={() => setMenuOpen(!menuOpen)}
             >
-              <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
+              {menuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </nav>

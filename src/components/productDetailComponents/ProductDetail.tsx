@@ -1,55 +1,50 @@
-function ProductDetail() {
-  const product = {
-    name: "iPhone 17 Pro Max",
-    brand: "Apple",
-    price: "$1,199",
-    color: "Titanium Gray",
-    rom: "512GB",
-    display: "6.9-inch Super Retina XDR",
-    camera: "48MP + 12MP + 12MP Triple Camera",
-    battery: "4,500 mAh",
-    processor: "A18 Bionic Chip",
-    description:
-      "Experience ultimate performance and elegance with the new iPhone 16 Pro Max, featuring a stunning display, powerful camera system, and premium titanium design.",
-  };
+import type { Product } from "../../store/productStore";
+interface DetailsSectionProps {
+  products: Product | null;
+}
+function ProductDetail({ detail }: DetailsSectionProps) {
+  if (!detail) {
+    return <p className="text-center text-gray-500 py-10">Loading product details...</p>;
+  }
+
 
   return (
     <div className="w-full bg-white rounded-2xl shadow-lg p-6 sm:p-8">
       <div className="max-w-4xl mx-auto flex flex-col gap-6">
         {/* PRODUCT NAME */}
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 text-center">
-          {product.name}
+          {detail.name}
         </h2>
 
         {/* BRAND & PRICE */}
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end gap-2 border-b border-gray-200 pb-4">
           <p className="text-gray-700 text-lg font-medium">
-            Brand: <span className="font-semibold">{product.brand}</span>
+            Brand: <span className="font-semibold">{detail.brand}</span>
           </p>
           <p className="text-3xl sm:text-4xl font-bold text-blue-600">
-            {product.price}
+            Rs {detail.price}
           </p>
         </div>
 
         {/* PRODUCT DETAILS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-gray-700 mt-4">
           <p>
-            <span className="font-semibold text-gray-800">Color:</span> {product.color}
+            <span className="font-semibold text-gray-800">Color:</span> {detail.color}
           </p>
           <p>
-            <span className="font-semibold text-gray-800">Storage (ROM):</span> {product.rom}
+            <span className="font-semibold text-gray-800">Storage (ROM):</span> {detail.rom}
           </p>
           <p>
-            <span className="font-semibold text-gray-800">Display:</span> {product.display}
+            <span className="font-semibold text-gray-800">Display:</span> {detail.display}
           </p>
           <p>
-            <span className="font-semibold text-gray-800">Camera:</span> {product.camera}
+            <span className="font-semibold text-gray-800">Camera:</span> {detail.camera}
           </p>
           <p>
-            <span className="font-semibold text-gray-800">Battery:</span> {product.battery}
+            <span className="font-semibold text-gray-800">Battery:</span> {detail.battery}
           </p>
           <p>
-            <span className="font-semibold text-gray-800">Processor:</span> {product.processor}
+            <span className="font-semibold text-gray-800">Processor:</span> {detail.processor}
           </p>
         </div>
 
@@ -59,7 +54,7 @@ function ProductDetail() {
             Description
           </h3>
           <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-            {product.description}
+            {detail.description}
           </p>
         </div>
       </div>

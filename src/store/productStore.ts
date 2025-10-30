@@ -1,0 +1,100 @@
+import {create} from 'zustand'
+import image1 from '../assets/mobile5.jpg'
+import image2 from '../assets/mobile3.jpg'
+import image3 from '../assets/mobile6.jpg'
+export interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  color: string;
+  rom: string;
+  display: string;
+  camera: string;
+  battery: string;
+  processor: string;
+  description: string;
+  image: string;
+}
+
+interface ProductStore {
+  product: Product[];
+  currentProduct: Product | null;
+  findProduct: (id: number) => void;
+}
+const productStore = create<ProductStore>((set)=>({
+    product: [
+    {
+      id: 1,
+      name: "iPhone 17 Pro Max",
+      brand: "Apple",
+      price: 1499,
+      color: "Titanium Gray",
+      rom: "1TB",
+      display: "6.9-inch Super Retina XDR",
+      camera: "48MP + 12MP + 12MP Triple Camera",
+      battery: "4,800 mAh",
+      processor: "A19 Bionic Chip",
+      description:
+        "The iPhone 17 Pro Max combines cutting-edge design with lightning-fast performance, featuring a 6.9-inch display and A19 chip.",
+      image: image1,
+    },
+    {
+      id: 2,
+      name: "iPhone 17 Pro Max",
+      brand: "Apple",
+      price: 1399,
+      color: "Natural Titanium",
+      rom: "512GB",
+      display: "6.9-inch Super Retina XDR",
+      camera: "48MP + 12MP + 12MP Triple Camera",
+      battery: "4,800 mAh",
+      processor: "A19 Bionic Chip",
+      description:
+        "Experience elegance and power with the Natural Titanium iPhone 17 Pro Max featuring unmatched performance.",
+      image: image3,
+    },
+    {
+      id: 3,
+      name: "iPhone 17 Pro Max",
+      brand: "Apple",
+      price: 1299,
+      color: "Blue Titanium",
+      rom: "256GB",
+      display: "6.9-inch Super Retina XDR",
+      camera: "48MP + 12MP + 12MP Triple Camera",
+      battery: "4,800 mAh",
+      processor: "A19 Bionic Chip",
+      description:
+        "The Blue Titanium iPhone 17 Pro Max delivers beauty and performance with an ultra-efficient A19 chip.",
+      image: image2,
+    },
+    {
+      id: 3,
+      name: "iPhone 17 Pro Max",
+      brand: "Apple",
+      price: 1299,
+      color: "Blue Titanium",
+      rom: "256GB",
+      display: "6.9-inch Super Retina XDR",
+      camera: "48MP + 12MP + 12MP Triple Camera",
+      battery: "4,800 mAh",
+      processor: "A19 Bionic Chip",
+      description:
+        "The Blue Titanium iPhone 17 Pro Max delivers beauty and performance with an ultra-efficient A19 chip.",
+      image: image1,
+    },
+  ],
+  currentProduct: null,
+
+  findProduct: (id: number) =>
+    set((state) => {
+      const found = state.product.find((p) => p.id === id) || null;
+      return { currentProduct: found };
+    }),
+
+    
+
+}))
+
+export default productStore

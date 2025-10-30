@@ -1,18 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MainLayout from "../../components/layout/MainLayout";
 import DetailsSection from "../../components/productDetailComponents/DetailsSection";
 import ProductDetail from "../../components/productDetailComponents/ProductDetail";
 import RatingReview from "../../components/productDetailComponents/RatingReview";
-
+import { useParams } from "react-router-dom";
+import productStore from "../../store/productStore";
 function ProductDetails() {
-
+  const { productId } = useParams();
+  const { findProduct,currentProduct } = productStore()
   const [activeTab, setActiveTab] = useState<string>("details");
+  useEffect(()=>{
+    function sendProductId(){
+        findProduct(Number(productId))
+    }
+    sendProductId()
+  },[])
+  
 
   return (
     <>
       <div className="w-full min-h-screen">
         <MainLayout>
-          <DetailsSection />
+          <DetailsSection products={currentProduct}/>
           {/* Tabs Section */}
           <div className="w-full bg-white">
             <div className="w-full mx-auto flex justify-center items-center gap-8 sm:gap-20 py-4 sm:py-6">
@@ -47,7 +56,7 @@ function ProductDetails() {
             <div className="w-full mx-auto px-10 py-5 text-gray-700">
               {activeTab === "details" ? (
                 <>
-                <ProductDetail/>
+                <ProductDetail detail={currentProduct}/>
                 </>
               ) : (
                 <>

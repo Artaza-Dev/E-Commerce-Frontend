@@ -1,12 +1,13 @@
-import MainLayout from "../../components/layout/MainLayout"
+import MainLayout from "../../components/layout/MainLayout";
+import OrderHistory from "../../components/orderComponent/OrderHistory";
 function Orders() {
   return (
     <>
-        <MainLayout>
-            <div className="w-full h-[350px]">Categories</div>
-        </MainLayout>
+      <MainLayout>
+        <OrderHistory/>
+      </MainLayout>
     </>
-  )
+  );
 }
 
-export default Orders
+export default Orders;

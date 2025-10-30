@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
+import { Trash,Plus, Minus } from 'lucide-react';
 import image1 from "../../assets/mobile5.jpg";
 import image2 from "../../assets/mobile6.jpg";
 interface CartItem {
@@ -115,7 +115,7 @@ const CartSection: React.FC = () => {
                     onClick={() => decreaseQuantity(item.id)}
                     className="p-2 text-gray-700 hover:bg-gray-300 transition-all cursor-pointer"
                   >
-                    <FaMinus size={14} />
+                    <Minus size={14} />
                   </button>
                   <span className="px-4 font-medium text-gray-800">
                     {item.quantity}
@@ -124,7 +124,7 @@ const CartSection: React.FC = () => {
                     onClick={() => increaseQuantity(item.id)}
                     className="p-2 text-gray-700 hover:bg-gray-300 transition-all cursor-pointer"
                   >
-                    <FaPlus size={14} />
+                    <Plus size={14} />
                   </button>
                 </div>
 
@@ -132,7 +132,7 @@ const CartSection: React.FC = () => {
                   onClick={() => removeItem(item.id)}
                   className="text-red-500 hover:text-red-700 transition-all cursor-pointer"
                 >
-                  <FaTrash size={18} />
+                  <Trash size={20} />
                 </button>
               </div>
             </div>

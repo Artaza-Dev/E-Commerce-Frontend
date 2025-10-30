@@ -1,6 +1,13 @@
 import image1 from "../../assets/mobile5.jpg";
-import image2 from "../../assets/mobile4.jpg";
-function DetailsSection() {
+import type { Product } from "../../store/productStore";
+interface DetailsSectionProps {
+  products: Product | null;
+}
+function DetailsSection({ products }: DetailsSectionProps) {
+  if (!products) {
+    return <p className="text-center text-gray-500 py-10">Loading product details...</p>;
+  }
+
   return (
     <>
       <div className="w-full bg-gray-100 py-6 sm:py-10 lg:py-14 2xl:py-20">
@@ -11,7 +18,7 @@ function DetailsSection() {
               {/* Main Image */}
               <div className="w-full lg:w-[75%] rounded-2xl overflow-hidden border-gray-200">
                 <img
-                  src={image2}
+                  src={products.image}
                   alt="main"
                   className="w-full h-[350px] sm:h-[400px] lg:h-[480px] rounded-2xl"
                 />
@@ -46,7 +53,7 @@ function DetailsSection() {
             {/* RIGHT SECTION - DETAILS */}
             <div className="w-full lg:w-1/2 space-y-4">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                ONE LIFE GRAPHIC T-SHIRT
+                {products.name}
               </h2>
 
               {/* Rating */}
@@ -56,13 +63,11 @@ function DetailsSection() {
               </div>
 
               {/* Price */}
-              <div className="text-3xl font-semibold text-gray-800">$260</div>
+              <div className="text-3xl font-semibold text-gray-800">Rs {products.price}</div>
 
               {/* Description */}
               <p className="text-gray-600 text-sm sm:text-base">
-                This graphic t-shirt is perfect for any occasion. Crafted from
-                soft and breathable fabric, it offers superior comfort and
-                style.
+                {products.description}
               </p>
 
               {/* Color Options */}

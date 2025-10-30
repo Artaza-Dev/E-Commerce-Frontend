@@ -1,4 +1,4 @@
-import { FaTag, FaArrowRight } from "react-icons/fa";
+import { Tag, ArrowRight } from 'lucide-react';
 
 interface SummaryProps {
   subtotal: number;
@@ -55,7 +55,7 @@ const OrderSummary: React.FC = () => {
       {/* Promo Code */}
       <div className="flex gap-2 mt-6">
         <div className="flex items-center flex-grow bg-white border-zinc-700 rounded-lg p-3 shadow-sm">
-          <FaTag className="text-gray-500 mr-2" size={16} />
+          <Tag className="text-gray-500 mr-2" size={20} />
           <input
             type="text"
             placeholder="Add coupon code"
@@ -71,7 +71,7 @@ const OrderSummary: React.FC = () => {
       {/* Checkout Button */}
       <button className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer">
         Go to Checkout
-        <FaArrowRight />
+        <ArrowRight />
       </button>
     </div>
   );
