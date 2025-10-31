@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { X, SlidersHorizontal } from "lucide-react";
-
+import productStore from "../../store/productStore";
 function FilterSection() {
   const [isOpen, setIsOpen] = useState(false);
-
+  const {product} = productStore();
   return (
     <>
       {/* Mobile Filter Button (Fixed at top of results) */}
@@ -39,88 +39,18 @@ function FilterSection() {
         </div>
 
         {/* OS Filter */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-700 mb-2">Operating System</h3>
-          <div className="flex flex-col space-y-2 text-gray-600">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" className="w-4 h-4 cursor-pointer" />{" "}
-              Android
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="checkbox" className="w-4 h-4 cursor-pointer" /> iOS
-            </label>
-          </div>
+          <div className="mb-6">
+        <h3 className="font-semibold text-gray-700 mb-2">Categories</h3>
+        <div className="flex flex-col space-y-2 text-gray-600">
+          {product.map(
+            (val, index) => (
+              <div key={index} className="w-full h-10 border-zinc-500 rounded-xl hover:bg-gray-100 flex items-center pl-2 cursor-pointer">
+                <p className="">{val.category}</p>
+              </div>
+            )
+          )}
         </div>
-
-        {/* Mobile Company */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-700 mb-2">Mobile Company</h3>
-          <div className="flex flex-col space-y-2 text-gray-600">
-            {["Samsung", "iPhone", "Infinix", "Vivo", "Oppo"].map(
-              (brand, index) => (
-                <label key={index} className="flex items-center gap-2">
-                  <input type="checkbox" className="w-4 h-4 cursor-pointer" />{" "}
-                  {brand}
-                </label>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-700 mb-2">
-            Price Range (PKR)
-          </h3>
-          <input
-            type="range"
-            min="10000"
-            max="300000"
-            className="w-full accent-green-500 cursor-pointer"
-          />
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>10,000</span>
-            <span>300,000</span>
-          </div>
-        </div>
-
-        {/* RAM */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-700 mb-2">RAM</h3>
-          <div className="flex flex-col space-y-2 text-gray-600">
-            {["4GB", "6GB", "8GB", "12GB"].map((ram, index) => (
-              <label
-                key={index}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input type="checkbox" className="w-4 h-4" /> {ram}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* ROM */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-700 mb-2">Storage (ROM)</h3>
-          <div className="flex flex-col space-y-2 text-gray-600">
-            {["64GB", "128GB", "256GB", "512GB"].map((rom, index) => (
-              <label key={index} className="flex items-center gap-2">
-                <input type="checkbox" className="w-4 h-4 cursor-pointer" />{" "}
-                {rom}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Apply / Clear Buttons */}
-        <div className="flex justify-between gap-3 mt-8">
-          <button className="w-1/2 bg-black text-white py-2 rounded-lg hover:bg-gray-800 cursor-pointer transition">
-            Apply
-          </button>
-          <button className="w-1/2 border border-gray-400 py-2 rounded-lg hover:bg-gray-100 transition cursor-pointer">
-            Clear
-          </button>
-        </div>
+      </div>
       </div>
 
       {/* Overlay for Mobile */}

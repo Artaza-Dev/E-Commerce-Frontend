@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import productStore from "../../store/productStore";
 interface ItemCardProps {
   cardImage: string;
   cardTitle: string;
@@ -16,7 +16,13 @@ const ItemCards: React.FC<ItemCardProps> = ({
   productId,
 }) => {
   const navigate = useNavigate();
+  const { addProductToWishList } = productStore();
   const [wish, setWish] = useState<boolean>(false);
+  function addWishProductId(id: number) {
+     setWish(!wish)
+     addProductToWishList(id)
+     
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
@@ -43,7 +49,7 @@ const ItemCards: React.FC<ItemCardProps> = ({
                   ? "text-red-500 hover:text-red-600"
                   : "text-black hover:text-gray-800"
               } cursor-pointer`}
-              onClick={() => setWish(!wish)}
+              onClick={() => addWishProductId(productId)}
             />
           </div>
         </div>

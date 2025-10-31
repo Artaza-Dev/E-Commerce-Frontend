@@ -4,7 +4,7 @@ import type {
   FormEvent,
   MouseEvent as ReactMouseEvent,
 } from "react";
-import { Eye, EyeOff, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import Loader from "react-js-loader";
@@ -14,35 +14,26 @@ import CredientialButton from "../../components/ui/CredientialButton";
 // Define types for errors
 interface FormErrors {
   email?: string;
-  password?: string;
 }
-
 // Define type for user data
 interface UserData {
   email: string;
-  password: string;
 }
 
-const Login: React.FC = () => {
+const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = React.useState<string>("");
-  const [password, setPassword] = React.useState<string>("");
+
   const [loading, setLoading] = React.useState<boolean>(false);
   const [errors, setErrors] = React.useState<FormErrors>({});
-  const [showPassword, setShowPassword] = React.useState<boolean>(false);
 
   // Yup Validation Schema (no phone)
   const signupSchema = Yup.object().shape({
     email: Yup.string()
       .email("Please enter a valid email")
       .required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
   });
-
-  const viewHandler = (): void => setShowPassword((s) => !s);
 
   // signupHandler accepts either a form submit event OR a button click event
   const signupHandler = async (
@@ -58,9 +49,9 @@ const Login: React.FC = () => {
       // await new Promise((resolve) => setTimeout(resolve, 800));
 
       // validate
-      await signupSchema.validate({ email, password }, { abortEarly: false });
+      await signupSchema.validate({ email }, { abortEarly: false });
 
-      // TODO: replace with your real user store / API call
+      // replace with your real user store / API call
       const users: UserData[] = []; // placeholder
 
       const existingUser = users.find((u) => u.email === email);
@@ -72,10 +63,9 @@ const Login: React.FC = () => {
         return;
       }
 
-      const data: UserData = { email, password };
+      const data: UserData = { email };
       console.log("Registered:", data);
       setEmail("");
-      setPassword("");
       setErrors({});
       navigate("/");
     } catch (err: any) {
@@ -108,22 +98,21 @@ const Login: React.FC = () => {
       <div className="w-full min-h-screen flex items-center justify-center p-4">
         <div
           className="
-    w-full max-w-[500px]     
-    sm:max-w-[450px] 
-    md:max-w-[400px] 
-    lg:max-w-[420px] 
-    xl:max-w-[450px]
-    2xl:max-w-[480px]
-
-    h-auto min-h-[350px]         
-    sm:min-h-[400px] 
-    md:min-h-[420px] 
-    lg:min-h-[440px] 
-    xl:min-h-[460px] 
-    2xl:min-h-[480px]
-    bg-gray-200 border rounded-2xl shadow-2xl 
-    flex flex-col items-center p-6
-  "
+      w-full max-w-[500px]     
+      sm:max-w-[450px] 
+      md:max-w-[400px] 
+      lg:max-w-[420px] 
+      xl:max-w-[450px]
+      2xl:max-w-[480px]
+      h-auto min-h-[300px]         
+      sm:min-h-[321px] 
+      md:min-h-[340px] 
+      lg:min-h-[360px] 
+      xl:min-h-[380px] 
+      2xl:min-h-[400px]
+      bg-gray-200 border rounded-2xl shadow-2xl 
+      flex flex-col items-center p-6
+    "
         >
           {/* Header */}
           <div className="w-full flex flex-col items-center pt-4">
@@ -132,10 +121,11 @@ const Login: React.FC = () => {
               className="text-[150px] sm:text-[180px] md:text-[200px] mb-2 shadow-2xl"
             />
             <p className="text-2xl sm:text-3xl font-semibold tracking-wide">
-              Welcome Back
+              Forgot Password
             </p>
-            <p className="text-xs sm:text-sm text-gray-700 mt-1">
-              Create your account
+            <p className="text-xs sm:text-sm text-gray-700 mt-1 text-center">
+              Enter your registered email and we’ll send you an OTP to reset
+              your password
             </p>
           </div>
 
@@ -156,49 +146,13 @@ const Login: React.FC = () => {
                 <Input
                   type="email"
                   value={email}
-                  placeholder="Enter your email"
+                  placeholder="Enter your registered email"
                   className="placeholder-gray-300"
                   onchange={handleChange(setEmail)}
                 />
                 {errors.email && (
                   <p className="text-sm text-red-600">{errors.email}</p>
                 )}
-
-                {/* Password Input */}
-                <div className="w-full h-auto relative">
-                  {showPassword ? (
-                    <Eye
-                      className="text-md absolute top-4 right-4 cursor-pointer"
-                      onClick={viewHandler}
-                    />
-                  ) : (
-                    <EyeOff
-                      className="text-md absolute top-4 right-4 cursor-pointer"
-                      onClick={viewHandler}
-                    />
-                  )}
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    placeholder="Enter your password"
-                    className="placeholder-gray-300"
-                    onchange={handleChange(setPassword)}
-                  />
-                </div>
-
-                {errors.password && (
-                  <p className="text-sm text-red-600">{errors.password}</p>
-                )}
-
-                {/* ✅ Forgot Password Link */}
-                <div className="w-full flex justify-end mt-1">
-                  <NavLink
-                    to="/forgotpassword"
-                    className="text-xs sm:text-sm text-blue-700 hover:text-blue-900 font-medium cursor-pointer"
-                  >
-                    Forgot Password?
-                  </NavLink>
-                </div>
               </>
             )}
           </form>
@@ -207,16 +161,18 @@ const Login: React.FC = () => {
           <div className="w-full flex flex-col items-center mt-5">
             <CredientialButton
               className="w-[80%] font-semibold py-2 rounded-lg shadow-md transition-all duration-300"
-              text={loading ? "Please wait..." : "Login"}
+              text={loading ? "Please wait..." : "Send OTP"}
               onclick={signupHandler as unknown as () => void}
             />
-            <p className="text-xs sm:text-sm mt-2">
-              Do you have an account?{" "}
+
+            {/* Back to login */}
+            <p className="text-xs sm:text-sm mt-3 text-gray-700">
+              Remember your password?{" "}
               <NavLink
-                to="/"
+                to="/login"
                 className="text-blue-700 font-medium cursor-pointer hover:text-zinc-800"
               >
-                Sign In
+                Go to Login
               </NavLink>
             </p>
           </div>
@@ -226,4 +182,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

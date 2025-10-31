@@ -6,6 +6,7 @@ export interface Product {
   id: number;
   name: string;
   brand: string;
+  category: string;
   price: number;
   color: string;
   rom: string;
@@ -20,6 +21,7 @@ export interface Product {
 interface ProductStore {
   product: Product[];
   currentProduct: Product | null;
+  wishListProducts: Product[] ;
   findProduct: (id: number) => void;
 }
 const productStore = create<ProductStore>((set)=>({
@@ -28,6 +30,7 @@ const productStore = create<ProductStore>((set)=>({
       id: 1,
       name: "iPhone 17 Pro Max",
       brand: "Apple",
+      category: "Laptop",
       price: 1499,
       color: "Titanium Gray",
       rom: "1TB",
@@ -43,6 +46,7 @@ const productStore = create<ProductStore>((set)=>({
       id: 2,
       name: "iPhone 17 Pro Max",
       brand: "Apple",
+      category: "Tablet",
       price: 1399,
       color: "Natural Titanium",
       rom: "512GB",
@@ -58,6 +62,7 @@ const productStore = create<ProductStore>((set)=>({
       id: 3,
       name: "iPhone 17 Pro Max",
       brand: "Apple",
+      category: "SmartPhone",
       price: 1299,
       color: "Blue Titanium",
       rom: "256GB",
@@ -73,6 +78,7 @@ const productStore = create<ProductStore>((set)=>({
       id: 3,
       name: "iPhone 17 Pro Max",
       brand: "Apple",
+      category: "Watch",
       price: 1299,
       color: "Blue Titanium",
       rom: "256GB",
@@ -86,12 +92,40 @@ const productStore = create<ProductStore>((set)=>({
     },
   ],
   currentProduct: null,
+  wishListProducts: [],
 
   findProduct: (id: number) =>
     set((state) => {
       const found = state.product.find((p) => p.id === id) || null;
       return { currentProduct: found };
     }),
+  
+  addProductToWishList: (id: number) => {
+  set((state) => {
+    // Find product from main product list
+    const foundProduct = state.product.find((p) => p.id === id);
+
+    if (!foundProduct) {
+      console.log("Product not found!");
+      return state;
+    }
+
+    // Check if product already in wishlist
+    const isAlreadyInWishlist = state.wishListProducts.some((p) => p.id === id);
+
+    if (isAlreadyInWishlist) {
+      // Remove from wishlist
+      const updatedWishlist = state.wishListProducts.filter((p) => p.id !== id);
+      console.log("Removed from wishlist:", foundProduct);
+      return { wishListProducts: updatedWishlist };
+    } else {
+      // Add to wishlist
+      const updatedWishlist = [...state.wishListProducts, foundProduct];
+      console.log("Added to wishlist:", foundProduct);
+      return { wishListProducts: updatedWishlist };
+    }
+  });
+},
 
     
 
