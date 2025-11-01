@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import MainLayout from "../../components/layout/MainLayout";
 import AddAddress from "../../components/checkoutComponent/AddAddress";
+import AddressCard from "../../components/checkoutComponent/AddressCard";
 
 // ✅ Cart item type
 interface CartItem {
@@ -93,12 +94,10 @@ const CheckoutPage: React.FC = () => {
                 {/* Tab Content */}
                 <div className="w-full bg-gray-50 rounded-xl shadow-inner px-5 sm:px-8 py-6 transition-all duration-500">
                   {activeTab === "saveAddress" ? (
-                      <AddAddress/>
+                    <AddAddress />
                   ) : (
-                    <div className="text-center sm:text-left animate-fadeIn">
-                      <p className="text-gray-700 text-base sm:text-lg font-medium">
-                        Your saved addresses will appear here.
-                      </p>
+                    <div className="w-full bg-gray-50 rounded-xl shadow-inner flex justify-center items-center py-10 transition-all duration-500">
+                      <AddressCard />
                     </div>
                   )}
                 </div>

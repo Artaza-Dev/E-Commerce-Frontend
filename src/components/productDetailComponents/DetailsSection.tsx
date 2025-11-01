@@ -16,10 +16,10 @@ function DetailsSection({ products }: DetailsSectionProps) {
 
   const images = [products.image, image1, image3];
 
-  // 👇 State for currently selected image (default = first)
+  //  State for currently selected image (default = first)
   const [mainImage, setMainImage] = useState<string>(images[0]);
 
-  // 👇 Handler to change main image when thumbnail clicked
+  //  Handler to change main image when thumbnail clicked
   const handleThumbnailClick = (img: string) => {
     setMainImage(img);
   };
@@ -29,8 +29,8 @@ function DetailsSection({ products }: DetailsSectionProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-6 bg-white rounded-2xl shadow-lg">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-8 ">
             {/* LEFT SECTION - PRODUCT IMAGES */}
-            <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-2">
-              {/* ✅ MAIN IMAGE */}
+            <div className="w-full lg:w-1/2 flex flex-col lg:flex-row gap-2 py-3">
+              {/*  MAIN IMAGE */}
               <div className="w-full lg:w-[75%] rounded-2xl overflow-hidden border-gray-200">
                 <img
                   src={mainImage}
@@ -39,7 +39,7 @@ function DetailsSection({ products }: DetailsSectionProps) {
                 />
               </div>
 
-              {/* ✅ THUMBNAIL IMAGES */}
+              {/*  THUMBNAIL IMAGES */}
               <div className="flex lg:flex-col justify-center items-center gap-3 mt-4 lg:mt-0 lg:w-[25%]">
                 {images.map((img, index) => (
                   <div
