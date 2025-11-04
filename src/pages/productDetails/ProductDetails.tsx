@@ -7,21 +7,22 @@ import { useParams } from "react-router-dom";
 import productStore from "../../store/productStore";
 function ProductDetails() {
   const { productId } = useParams();
-  const { findProduct,currentProduct } = productStore()
+  const { findProduct } = productStore()
   const [activeTab, setActiveTab] = useState<string>("details");
   useEffect(()=>{
     function sendProductId(){
-        findProduct(Number(productId))
+        console.log("id in page",productId);
+        findProduct(( productId as string))
     }
     sendProductId()
-  },[])
+  },[productId])
   
 
   return (
     <>
       <div className="w-full min-h-screen">
         <MainLayout>
-          <DetailsSection products={currentProduct}/>
+          <DetailsSection/>
           {/* Tabs Section */}
           <div className="w-full bg-white">
             <div className="w-full mx-auto flex justify-center items-center gap-8 sm:gap-20 py-4 sm:py-6">

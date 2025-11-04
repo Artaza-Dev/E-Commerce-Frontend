@@ -27,7 +27,7 @@ function FilterSection() {
   transform transition-transform duration-300 ease-in-out hide-scrollbar
   ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        {/* Close button (Mobile only) */}
+        {/* Close button (for Mobile only) */}
         <div className="flex justify-between items-center mb-4 lg:hidden">
           <h2 className="text-lg font-semibold text-gray-700">Filters</h2>
           <button

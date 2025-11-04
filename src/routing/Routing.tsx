@@ -7,9 +7,9 @@ import Categories from "../pages/categories/Categories"
 import Orders from "../pages/orders/Orders"
 import Signup from "../pages/signup/Signup"
 import Login from "../pages/login/Login"
-import ForgotPassword from "../pages/forgotPassword/ForgotPassword"
-import VerifyOtp from "../pages/verifyOtp/VerifyOtp"
-import ResetPassword from "../pages/resetPassword/ResetPassword"
+// import ForgotPassword from "../pages/forgotPassword/ForgotPassword"
+// import VerifyOtp from "../pages/verifyOtp/VerifyOtp"
+// import ResetPassword from "../pages/resetPassword/ResetPassword"
 import Checkout from "../pages/checkout/Checkout"
 function Routing() {
   return (
@@ -23,10 +23,10 @@ function Routing() {
             <Route path="/orders" element={<Orders/>}/>
             <Route path="/signup" element={<Signup/>}/>
             <Route path="/login" element={<Login/>}/>
-            <Route path="/forgotpassword" element={<ForgotPassword/>}/>
-            <Route path="/verifyotp" element={<VerifyOtp/>}/>
-            <Route path="/resetpassword" element={<ResetPassword/>}/>
             <Route path="/checkout" element={<Checkout/>}/>
+            {/* <Route path="/forgotpassword" element={<ForgotPassword/>}/>
+            <Route path="/verifyotp" element={<VerifyOtp/>}/>
+            <Route path="/resetpassword" element={<ResetPassword/>}/> */}
         </Routes>
     </BrowserRouter>
   )

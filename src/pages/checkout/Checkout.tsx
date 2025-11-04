@@ -5,7 +5,7 @@ import MainLayout from "../../components/layout/MainLayout";
 import AddAddress from "../../components/checkoutComponent/AddAddress";
 import AddressCard from "../../components/checkoutComponent/AddressCard";
 
-// ✅ Cart item type
+//  Cart item type
 interface CartItem {
   id: number;
   name: string;
@@ -29,7 +29,7 @@ const CheckoutPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<string>("saveAddress");
 
-  // ✅ Calculations
+  //  Calculations
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0

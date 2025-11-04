@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import image1 from "../../assets/mobile3.jpg";
 import image3 from "../../assets/mobile6.jpg";
 import type { Product } from "../../store/productStore";
+import productStore from "../../store/productStore";
 interface DetailsSectionProps {
   products: Product | null;
 }
 function DetailsSection({ products }: DetailsSectionProps) {
+  const { currentProduct } = productStore();
+  const [productsState, setProductsState] = useState<Product | null>(products);
+  useEffect(()=>{
+    setProductsState(currentProduct);
+  },[])
+  console.log("data in details page", currentProduct);
+  
   if (!products) {
     return (
       <p className="text-center text-gray-500 py-10">

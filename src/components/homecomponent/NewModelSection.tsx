@@ -1,8 +1,14 @@
 import Button from "../ui/Button";
 import ItemCards from "../ui/ItemCards";
 import productStore from "../../store/productStore";
+import { useEffect } from "react";
 function NewModelSection() {
-  const { product } = productStore();
+  const { product,  fetchProducts } = productStore();
+  useEffect(()=>{
+    fetchProducts()
+  }, [])
+  // console.log(product);
+  
   return (
     <>
       <div className="w-full min-h-[400px] p-5">
@@ -11,14 +17,15 @@ function NewModelSection() {
         </div>
         <div className="w-full py-10">
           <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-            {product.map((val, index) => {
+            {product?.map((val: any, index: number) => {
+              const variant = val?.variants?.[0]?.variantId;
               return (
                 <ItemCards
                   key={index}
-                  cardImage={val.image}
-                  cardTitle={val.name}
-                  cardPrice={val.price}
-                  productId={val.id}
+                  cardImage={variant?.images}
+                  cardTitle={val?.name}
+                  cardPrice={variant?.price}
+                  productId={val?._id}
                 />
               );
             })}
