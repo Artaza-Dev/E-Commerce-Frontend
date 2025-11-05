@@ -61,7 +61,7 @@ const ItemCards: React.FC<ItemCardProps> = ({
       
       <div className="flex items-center space-x-2">
         <p className="text-2xl font-bold text-gray-900">
-          ${cardPrice}
+          Rs {cardPrice}
         </p>
       </div>
     </div>

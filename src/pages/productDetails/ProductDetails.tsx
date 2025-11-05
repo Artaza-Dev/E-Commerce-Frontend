@@ -57,7 +57,7 @@ function ProductDetails() {
             <div className="w-full mx-auto px-10 py-5 text-gray-700">
               {activeTab === "details" ? (
                 <>
-                <ProductDetail detail={currentProduct}/>
+                <ProductDetail/>
                 </>
               ) : (
                 <>

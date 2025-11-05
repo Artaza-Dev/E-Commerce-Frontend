@@ -1,36 +1,45 @@
 import { useEffect, useState } from "react";
-import image1 from "../../assets/mobile3.jpg";
-import image3 from "../../assets/mobile6.jpg";
-import type { Product } from "../../store/productStore";
 import productStore from "../../store/productStore";
-interface DetailsSectionProps {
-  products: Product | null;
-}
-function DetailsSection({ products }: DetailsSectionProps) {
+
+function DetailsSection() {
   const { currentProduct } = productStore();
-  const [productsState, setProductsState] = useState<Product | null>(products);
-  useEffect(()=>{
-    setProductsState(currentProduct);
-  },[])
-  console.log("data in details page", currentProduct);
-  
-  if (!products) {
+  const [mainImage, setMainImage] = useState<string>(null as any);
+  const [count, setCount] = useState<number>(1);
+
+  let image: string[] = [];
+  currentProduct?.images.forEach((imgs) => {
+    if (imgs) {
+      image.push(imgs);
+    }
+  });
+
+  useEffect(() => {
+    console.log("detail section page", currentProduct);
+
+    if (image.length > 0) {
+      setMainImage(image[0]);
+    }
+  }, [currentProduct]);
+  // console.log("data in details page", currentProduct?.variants?.[0]);
+  if (!currentProduct) {
     return (
       <p className="text-center text-gray-500 py-10">
         Loading product details...
       </p>
     );
   }
-
-  const images = [products.image, image1, image3];
-
-  //  State for currently selected image (default = first)
-  const [mainImage, setMainImage] = useState<string>(images[0]);
-
   //  Handler to change main image when thumbnail clicked
   const handleThumbnailClick = (img: string) => {
     setMainImage(img);
   };
+
+  function incrementHandler() {
+    setCount((prev) => prev + 1);
+  }
+  function decrementHandler() {
+    setCount((prev) => (prev > 1 ? prev - 1 : 1));
+  }
+
   return (
     <>
       <div className="w-full bg-gray-100 py-6 sm:py-10 lg:py-14 2xl:py-20">
@@ -49,7 +58,7 @@ function DetailsSection({ products }: DetailsSectionProps) {
 
               {/*  THUMBNAIL IMAGES */}
               <div className="flex lg:flex-col justify-center items-center gap-3 mt-4 lg:mt-0 lg:w-[25%]">
-                {images.map((img, index) => (
+                {image.map((img, index) => (
                   <div
                     key={index}
                     onClick={() => handleThumbnailClick(img)}
@@ -72,7 +81,7 @@ function DetailsSection({ products }: DetailsSectionProps) {
             {/* RIGHT SECTION - DETAILS */}
             <div className="w-full lg:w-1/2 space-y-4">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                {products.name}
+                {currentProduct.name}
               </h2>
 
               {/* Rating */}
@@ -83,57 +92,67 @@ function DetailsSection({ products }: DetailsSectionProps) {
 
               {/* Price */}
               <div className="text-3xl font-semibold text-gray-800">
-                Rs {products.price}
+                Rs {currentProduct?.variants?.[0]?.price || "N/A"}
               </div>
 
               {/* Description */}
               <p className="text-gray-600 text-sm sm:text-base">
-                {products.description}
+                {currentProduct?.description || "No description available."}
               </p>
 
               {/* Color Options */}
-              <div>
-                <p className="font-semibold text-gray-800 mb-2">Select Color</p>
-                <div className="flex space-x-3">
-                  <div className="w-6 h-6 rounded-full bg-green-800 cursor-pointer border-2 border-gray-300 hover:border-black"></div>
-                  <div className="w-6 h-6 rounded-full bg-blue-900 cursor-pointer border-2 border-gray-300 hover:border-black"></div>
-                  <div className="w-6 h-6 rounded-full bg-gray-900 cursor-pointer border-2 border-gray-300 hover:border-black"></div>
-                </div>
-              </div>
 
               {/* ROM Options */}
               <div>
-                <p className="font-semibold text-gray-800 mb-2">Choose ROM</p>
-                <div className="flex flex-wrap gap-3">
-                  <button className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition">
-                    64GB
-                  </button>
-                  <button className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition">
-                    128GB
-                  </button>
-                  <button className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition">
-                    256GB
-                  </button>
-                  <button className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition">
-                    512GB
-                  </button>
+                {/* Select Color */}
+                <p className="font-semibold text-gray-800 mb-2">Select Color</p>
+                <div className="flex space-x-3">
+                  {currentProduct.variants.map((variant, index) => (
+                    <button
+                      key={index}
+                      className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition"
+                    >
+                      {variant.color || "N/A"}
+                    </button>
+                  ))}
                 </div>
-              </div>
 
-              {/* Quantity and Add to Cart */}
-              <div className="flex items-center gap-4 pt-4">
-                <div className="flex items-center border rounded-full mb-3">
-                  <button className="px-4 py-2 text-xl font-semibold cursor-pointer hover:text-zinc-600">
-                    -
-                  </button>
-                  <span className="px-3 text-xl">1</span>
-                  <button className="px-4 py-2 text-xl font-semibold cursor-pointer hover:text-zinc-600">
-                    +
+                {/* Choose Specification */}
+                <p className="font-semibold text-gray-800 mb-2 mt-4">
+                  Choose Specification
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {currentProduct.variants.map((variant, index) => (
+                    <button
+                      key={index}
+                      className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition"
+                    >
+                      {variant.storage || "N/A"}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Quantity + Add to Cart */}
+                <div className="flex items-center gap-4 pt-4">
+                  <div className="flex items-center border rounded-full mb-3">
+                    <button
+                      className="px-4 py-2 text-xl font-semibold cursor-pointer hover:text-zinc-600"
+                      onClick={decrementHandler}
+                    >
+                      -
+                    </button>
+                    <span className="px-3 text-xl">{count}</span>
+                    <button
+                      className="px-4 py-2 text-xl font-semibold cursor-pointer hover:text-zinc-600"
+                      onClick={incrementHandler}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button className="flex-1 bg-black text-white py-3 rounded-full mb-3 hover:bg-gray-800 transition cursor-pointer">
+                    Add to Cart
                   </button>
                 </div>
-                <button className="flex-1 bg-black text-white py-3 rounded-full mb-3 hover:bg-gray-800 transition cursor-pointer">
-                  Add to Cart
-                </button>
               </div>
             </div>
           </div>
