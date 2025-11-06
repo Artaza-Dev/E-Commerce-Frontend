@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import productStore from "../../store/productStore";
-
+import { useNavigate } from "react-router-dom";
 function DetailsSection() {
-  const { currentProduct } = productStore();
+  const navigate = useNavigate()
+  const { currentProduct, addToCart } = productStore();
   const [mainImage, setMainImage] = useState<string>(null as any);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedStorage, setSelectedStorage] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState(null as any);
   const [count, setCount] = useState<number>(1);
 
   let image: string[] = [];
@@ -13,14 +17,26 @@ function DetailsSection() {
     }
   });
 
+  //set initial variant.
   useEffect(() => {
-    console.log("detail section page", currentProduct);
-
+    if (
+      currentProduct &&
+      currentProduct.variants &&
+      currentProduct.variants.length > 0
+    ) {
+      const firstVariant = currentProduct.variants[0];
+      setSelectedColor(firstVariant.color);
+      setSelectedStorage(firstVariant.storage);
+      setSelectedVariant(firstVariant);
+    }
+  }, [currentProduct]);
+  // Set main image when product changes
+  useEffect(() => {
     if (image.length > 0) {
       setMainImage(image[0]);
     }
   }, [currentProduct]);
-  // console.log("data in details page", currentProduct?.variants?.[0]);
+
   if (!currentProduct) {
     return (
       <p className="text-center text-gray-500 py-10">
@@ -33,12 +49,61 @@ function DetailsSection() {
     setMainImage(img);
   };
 
-  function incrementHandler() {
-    setCount((prev) => prev + 1);
-  }
-  function decrementHandler() {
+  const findVariant = (color: string, storage: string) => {
+    return currentProduct.variants.find(
+      (v) => v.color === color && v.storage === storage
+    );
+  };
+
+  //------------------- Increment and Decrement Handlers-----------------------
+  const incrementHandler = () => {
+    if (selectedVariant && count < selectedVariant.quantity) {
+      setCount((prev) => prev + 1);
+    }
+  };
+  const decrementHandler = () => {
     setCount((prev) => (prev > 1 ? prev - 1 : 1));
+  };
+  //-----------------------------------------------------------
+  // ------------- Handle color and storage select ----------------
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+
+    // keep same storage if possible
+    const variant = findVariant(color, selectedStorage || "");
+    if (variant) {
+      setSelectedVariant(variant);
+      setCount(1);
+    }
+  };
+  //  Handle storage select
+  const handleStorageSelect = (storage: string) => {
+    setSelectedStorage(storage);
+
+    const variant = findVariant(selectedColor || "", storage);
+    if (variant) {
+      setSelectedVariant(variant);
+      setCount(1);
+    }
+  };
+  // -----------------------------------------------------------
+  const addToCartHandler = async () => {
+    if (!currentProduct?._id || !selectedVariant?._id) {
+    alert("Please select a valid product variant.");
+    return;
   }
+    let data ={ variantId: selectedVariant._id, productId: currentProduct._id, count}
+    try {
+     let result = await addToCart(data as any);
+      if (result.success) {
+      navigate("/cart");
+    } else {
+      alert(result.message || "Something went wrong while adding to cart");
+    }
+    } catch (error) {
+      alert()
+    }
+  };
 
   return (
     <>
@@ -92,7 +157,7 @@ function DetailsSection() {
 
               {/* Price */}
               <div className="text-3xl font-semibold text-gray-800">
-                Rs {currentProduct?.variants?.[0]?.price || "N/A"}
+                Rs {selectedVariant?.price || "N/A"}
               </div>
 
               {/* Description */}
@@ -100,19 +165,24 @@ function DetailsSection() {
                 {currentProduct?.description || "No description available."}
               </p>
 
-              {/* Color Options */}
-
-              {/* ROM Options */}
               <div>
                 {/* Select Color */}
                 <p className="font-semibold text-gray-800 mb-2">Select Color</p>
                 <div className="flex space-x-3">
-                  {currentProduct.variants.map((variant, index) => (
+                  {[
+                    ...new Set(currentProduct.variants.map((v) => v.color)),
+                  ].map((color, index) => (
                     <button
                       key={index}
-                      className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition"
+                      onClick={() => handleColorSelect(color!)}
+                      className={`px-4 py-2 rounded-full border transition 
+          ${
+            selectedVariant?.color === color
+              ? "bg-black text-white border-black"
+              : "text-gray-800 hover:bg-black hover:text-white"
+          }`}
                     >
-                      {variant.color || "N/A"}
+                      {color || "N/A"}
                     </button>
                   ))}
                 </div>
@@ -122,12 +192,20 @@ function DetailsSection() {
                   Choose Specification
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  {currentProduct.variants.map((variant, index) => (
+                  {[
+                    ...new Set(currentProduct.variants.map((v) => v.storage)),
+                  ].map((storage, index) => (
                     <button
                       key={index}
-                      className="px-4 py-2 rounded-full border text-gray-800 hover:bg-black hover:text-white cursor-pointer transition"
+                      onClick={() => handleStorageSelect(storage!)}
+                      className={`px-4 py-2 rounded-full border transition 
+          ${
+            selectedVariant?.storage === storage
+              ? "bg-black text-white border-black"
+              : "text-gray-800 hover:bg-black hover:text-white"
+          }`}
                     >
-                      {variant.storage || "N/A"}
+                      {storage || "N/A"}
                     </button>
                   ))}
                 </div>
@@ -149,10 +227,16 @@ function DetailsSection() {
                       +
                     </button>
                   </div>
-                  <button className="flex-1 bg-black text-white py-3 rounded-full mb-3 hover:bg-gray-800 transition cursor-pointer">
+                  <button
+                    className="flex-1 bg-black text-white py-3 rounded-full mb-3 hover:bg-gray-800 transition cursor-pointer"
+                    onClick={addToCartHandler}
+                  >
                     Add to Cart
                   </button>
                 </div>
+                <p className="text-sm text-gray-500 mb-3">
+                  Available Quantity: {selectedVariant?.quantity || 0}
+                </p>
               </div>
             </div>
           </div>

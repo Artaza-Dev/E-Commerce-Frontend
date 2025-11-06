@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import Loader from "react-js-loader";
 import Input from "../../components/ui/Input";
 import CredientialButton from "../../components/ui/CredientialButton";
+import userStore from "../../store/userStore";
 
 // Define types for errors
 interface FormErrors {
@@ -28,7 +29,7 @@ interface UserData {
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
-
+  const { registerUser } = userStore();
   const [username, setUsername] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
@@ -47,6 +48,7 @@ const Signup: React.FC = () => {
       .required("Password is required"),
   });
 
+  // show hide password
   const viewHandler = (): void => setShowPassword((s) => !s);
 
   // signupHandler accepts either a form submit event OR a button click event
@@ -59,34 +61,23 @@ const Signup: React.FC = () => {
     setErrors({});
 
     try {
-      // mimic server delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
       // validate
       await signupSchema.validate(
         { username, email, password },
         { abortEarly: false }
       );
-
-      // TODO: replace with your real user store / API call
-      const users: UserData[] = []; // placeholder
-
-      const existingUser = users.find((u) => u.email === email);
-      if (existingUser) {
-        setErrors({
-          email: "This email is already registered. Please log in.",
-        });
-        setLoading(false);
-        return;
-      }
-
       const data: UserData = { username, email, password };
-      console.log("Registered:", data);
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setErrors({});
-      navigate("/");
+      const result = await registerUser(data);
+      if (result.success) {
+        console.log("Register successful:", result.data);
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setErrors({});
+        navigate("/login");
+      } else {
+        alert(result.message || "Registration failed");
+      }
     } catch (err: any) {
       // collect yup validation errors
       const valErrors: FormErrors = {};
@@ -122,7 +113,10 @@ const Signup: React.FC = () => {
         "
       >
         <div className="w-full flex flex-col items-center pt-4">
-         <ShoppingCart size={50} className="text-[150px] sm:text-[180px] md:text-[200px] mb-2 shadow-2xl" />
+          <ShoppingCart
+            size={50}
+            className="text-[150px] sm:text-[180px] md:text-[200px] mb-2 shadow-2xl"
+          />
           <p className="text-2xl sm:text-3xl font-semibold tracking-wide">
             Welcome Back
           </p>
@@ -201,7 +195,7 @@ const Signup: React.FC = () => {
           <p className=" text-xs sm:text-sm mt-2">
             Do you have an account?{" "}
             <NavLink
-              to="/"
+              to="/login"
               className=" text-blue-700 font-medium cursor-pointer hover:text-zinc-800"
             >
               Sign In

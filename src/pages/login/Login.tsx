@@ -10,6 +10,7 @@ import * as Yup from "yup";
 import Loader from "react-js-loader";
 import Input from "../../components/ui/Input";
 import CredientialButton from "../../components/ui/CredientialButton";
+import userStore from "../../store/userStore";
 
 // Define types for errors
 interface FormErrors {
@@ -25,7 +26,7 @@ interface UserData {
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-
+  const {loginUser} = userStore();
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -41,7 +42,7 @@ const Login: React.FC = () => {
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
   });
-
+  // hide and show password
   const viewHandler = (): void => setShowPassword((s) => !s);
 
   // signupHandler accepts either a form submit event OR a button click event
@@ -54,30 +55,19 @@ const Login: React.FC = () => {
     setErrors({});
 
     try {
-      // mimic server delay
-      // await new Promise((resolve) => setTimeout(resolve, 800));
-
       // validate
       await signupSchema.validate({ email, password }, { abortEarly: false });
-
-      // TODO: replace with your real user store / API call
-      const users: UserData[] = []; // placeholder
-
-      const existingUser = users.find((u) => u.email === email);
-      if (existingUser) {
-        setErrors({
-          email: "This email is already registered. Please log in.",
-        });
-        setLoading(false);
-        return;
-      }
-
       const data: UserData = { email, password };
+      const result = await loginUser(data);
       console.log("Registered:", data);
-      setEmail("");
-      setPassword("");
-      setErrors({});
-      navigate("/");
+      if (result.success) {
+        setEmail("");
+        setPassword("");
+        setErrors({});
+        navigate("/");
+      }else{
+        alert(result.message || "Login failed");
+      }
     } catch (err: any) {
       // collect yup validation errors
       const valErrors: FormErrors = {};
@@ -213,7 +203,7 @@ const Login: React.FC = () => {
             <p className="text-xs sm:text-sm mt-2">
               Do you have an account?{" "}
               <NavLink
-                to="/"
+                to="/signup"
                 className="text-blue-700 font-medium cursor-pointer hover:text-zinc-800"
               >
                 Sign In

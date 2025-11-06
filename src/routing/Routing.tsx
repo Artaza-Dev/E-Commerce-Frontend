@@ -7,26 +7,24 @@ import Categories from "../pages/categories/Categories"
 import Orders from "../pages/orders/Orders"
 import Signup from "../pages/signup/Signup"
 import Login from "../pages/login/Login"
-// import ForgotPassword from "../pages/forgotPassword/ForgotPassword"
-// import VerifyOtp from "../pages/verifyOtp/VerifyOtp"
-// import ResetPassword from "../pages/resetPassword/ResetPassword"
+import PublicRoute from "./PublicRoute"
+import PrivateRoute from "./PrivateRoute"
 import Checkout from "../pages/checkout/Checkout"
 function Routing() {
   return (
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Home/>}/>
-            <Route path="/productdetails/:productId" element={<ProductDetails/>}/>
-            <Route path="/cart" element={<Cart/>}/>
-            <Route path="/wishlist" element={<WishList/>}/>
-            <Route path="/categories" element={<Categories/>}/>
-            <Route path="/orders" element={<Orders/>}/>
-            <Route path="/signup" element={<Signup/>}/>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/checkout" element={<Checkout/>}/>
-            {/* <Route path="/forgotpassword" element={<ForgotPassword/>}/>
-            <Route path="/verifyotp" element={<VerifyOtp/>}/>
-            <Route path="/resetpassword" element={<ResetPassword/>}/> */}
+            <Route path="/" element={<PublicRoute><Home/></PublicRoute>}/>
+            <Route path="/productdetails/:productId" element={<PublicRoute><ProductDetails/></PublicRoute>}/>
+            <Route path="/categories" element={<PublicRoute><Categories/></PublicRoute>}/>
+
+            <Route path="/signup" element={<PublicRoute restricted><Signup /></PublicRoute>}/>
+            <Route path="/login" element={<PublicRoute restricted><Login /></PublicRoute>}/>
+
+            <Route path="/cart" element={<PrivateRoute><Cart/></PrivateRoute>}/>
+            <Route path="/wishlist" element={<PrivateRoute><WishList/></PrivateRoute>}/>
+            <Route path="/orders" element={<PrivateRoute><Orders/></PrivateRoute>}/>
+            <Route path="/checkout" element={<PrivateRoute><Checkout/></PrivateRoute>}/>
         </Routes>
     </BrowserRouter>
   )

@@ -1,5 +1,5 @@
 import image from "../../assets/mobile2.jpg";
-
+import { NavLink } from "react-router-dom";
 const HeroSection = () => {
   return (
     // Main Container: Full width, light background
@@ -8,8 +8,6 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center lg:space-x-12">
           {/* LEFT SECTION */}
           <div className="w-full lg:w-7/12 flex flex-col justify-center order-2 lg:order-1 text-center lg:text-left">
-           
-
             {/* Heading */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-gray-900 mb-6 leading-tight">
               <span className="inline-block hover:scale-105 transition-transform duration-300">
@@ -34,31 +32,32 @@ const HeroSection = () => {
             </p>
 
             {/* Features List */}
-            
 
             {/* Button */}
             <div className="mb-10 flex justify-center lg:justify-start">
-              <button className="group relative px-10 py-4 bg-black text-white text-lg font-bold rounded-full overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-                {/* Shine effect */}
-                <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+              <NavLink to="/categories">
+                <button className="group relative px-10 py-4 bg-black text-white text-lg font-bold rounded-full overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
+                  {/* Shine effect */}
+                  <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
 
-                <span className="relative flex items-center space-x-2">
-                  <span>Shop Now</span>
-                  <svg
-                    className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </span>
-              </button>
+                  <span className="relative flex items-center space-x-2">
+                    <span>Shop Now</span>
+                    <svg
+                      className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 8l4 4m0 0l-4 4m4-4H3"
+                      />
+                    </svg>
+                  </span>
+                </button>
+              </NavLink>
             </div>
 
             {/* STATS */}
@@ -112,7 +111,6 @@ const HeroSection = () => {
         </div>
       </div>
 
-      
       <div className="relative overflow-hidden bg-linear-to-r from-gray-950 via-gray-900 to-gray-950 py-10 mt-8 shadow-inner shadow-gray-800">
         <div className="animate-marquee whitespace-nowrap flex items-center italic font-serif">
           {["Smartphone", "Tablet", "Laptop", "Smartwatch", "Headphones"].map(
