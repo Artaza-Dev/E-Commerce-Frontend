@@ -8,7 +8,7 @@ function DetailsSection() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedStorage, setSelectedStorage] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState(null as any);
-  const [count, setCount] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number>(1);
 
   let image: string[] = [];
   currentProduct?.images.forEach((imgs) => {
@@ -57,12 +57,12 @@ function DetailsSection() {
 
   //------------------- Increment and Decrement Handlers-----------------------
   const incrementHandler = () => {
-    if (selectedVariant && count < selectedVariant.quantity) {
-      setCount((prev) => prev + 1);
+    if (selectedVariant && quantity < selectedVariant.quantity) {
+      setQuantity((prev) => prev + 1);
     }
   };
   const decrementHandler = () => {
-    setCount((prev) => (prev > 1 ? prev - 1 : 1));
+    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
   };
   //-----------------------------------------------------------
   // ------------- Handle color and storage select ----------------
@@ -73,7 +73,7 @@ function DetailsSection() {
     const variant = findVariant(color, selectedStorage || "");
     if (variant) {
       setSelectedVariant(variant);
-      setCount(1);
+      setQuantity(1);
     }
   };
   //  Handle storage select
@@ -83,7 +83,7 @@ function DetailsSection() {
     const variant = findVariant(selectedColor || "", storage);
     if (variant) {
       setSelectedVariant(variant);
-      setCount(1);
+      setQuantity(1);
     }
   };
   // -----------------------------------------------------------
@@ -92,11 +92,15 @@ function DetailsSection() {
     alert("Please select a valid product variant.");
     return;
   }
-    let data ={ variantId: selectedVariant._id, productId: currentProduct._id, count}
+  if (selectedVariant?.quantity === 0) {
+    alert("This variant is out of stock.");
+    return;
+  }
+    let data ={ variantId: selectedVariant._id, productId: currentProduct._id, quantity, variantMaxQuantity: selectedVariant?.quantity}
     try {
      let result = await addToCart(data as any);
       if (result.success) {
-      navigate("/cart");
+      navigate(`/productDetails/${data.productId}`);
     } else {
       alert(result.message || "Something went wrong while adding to cart");
     }
@@ -219,7 +223,7 @@ function DetailsSection() {
                     >
                       -
                     </button>
-                    <span className="px-3 text-xl">{count}</span>
+                    <span className="px-3 text-xl">{quantity}</span>
                     <button
                       className="px-4 py-2 text-xl font-semibold cursor-pointer hover:text-zinc-600"
                       onClick={incrementHandler}

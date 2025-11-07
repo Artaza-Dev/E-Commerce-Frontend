@@ -2,8 +2,17 @@ import { useState } from "react";
 import { X, SlidersHorizontal } from "lucide-react";
 import productStore from "../../store/productStore";
 function FilterSection() {
+  const { fetchProductByCategory, selectedCategory, setSelectedCategory } =
+    productStore();
   const [isOpen, setIsOpen] = useState(false);
-  const {product} = productStore();
+  const categoryHandler = async (category: string) => {
+    setSelectedCategory(category);
+    let res = await fetchProductByCategory(category);
+    if (!res.success) {
+      alert(res.message || "Failed to get items by category");
+    }
+    setIsOpen(false);
+  };
   return (
     <>
       {/* Mobile Filter Button (Fixed at top of results) */}
@@ -16,7 +25,6 @@ function FilterSection() {
           <SlidersHorizontal size={22} />
         </button>
       </div>
-
       {/* Sidebar (Desktop & Mobile both) */}
       <div
         className={`fixed lg:static top-0 left-0 z-50 lg:z-auto
@@ -39,18 +47,35 @@ function FilterSection() {
         </div>
 
         {/* OS Filter */}
-          <div className="mb-6">
-        <h3 className="font-semibold text-gray-700 mb-2">Categories</h3>
-        <div className="flex flex-col space-y-2 text-gray-600">
-          {product.map(
-            (val, index) => (
-              <div key={index} className="w-full h-10 border-zinc-500 rounded-xl hover:bg-gray-100 flex items-center pl-2 cursor-pointer">
-                <p className="">{val.category}</p>
-              </div>
-            )
-          )}
+        <div className="mb-6">
+          <h3 className="font-semibold text-gray-700 mb-2">Categories</h3>
+          <div className="flex flex-col space-y-2 text-gray-600">
+            {[
+              "AllProducts",
+              "Smartphone",
+              "Laptop",
+              "Tablet",
+              "Smartwatch",
+              "Headphone",
+            ].map((val, index) => {
+              const active = selectedCategory === val;
+              return (
+                <div
+                  key={index}
+                  className={`w-full h-10 rounded-xl flex items-center pl-4 cursor-pointer transition 
+                    ${
+                      active
+                        ? "bg-black text-white border-black"
+                        : "border border-transparent hover:bg-gray-100 text-gray-700"
+                    }`}
+                  onClick={() => categoryHandler(val)}
+                >
+                  <p className="">{val}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Overlay for Mobile */}

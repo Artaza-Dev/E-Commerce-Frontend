@@ -11,11 +11,26 @@ interface ProductStore {
   loading: boolean;
   error: string | null;
   cartItems: any[];
+  categoryItems: any[];
+  selectedCategory: string;
+  setSelectedCategory: (cat: string) => void;
+  fetchProductByCategory: (
+    id: string
+  ) => Promise<{ success: boolean; message?: string; data?: any }>;
   fetchProducts: () => Promise<void>;
   findProduct: (id: string) => Promise<void>;
-  addProductToWishList: (id: string) => void;
-  addToCart: (data: Cart) => Promise<{ success: boolean; message?: string }>
-  fetchCartItems: (data: Cart) => Promise<{ success: boolean; message?: string }>
+  addToCart: (data: Cart) => Promise<{ success: boolean; message?: string }>;
+  fetchCartItems: (
+    data: Cart
+  ) => Promise<{ success: boolean; message?: string }>;
+  deleteCartItems: (
+    id: string
+  ) => Promise<{ success: boolean; message?: string }>;
+  addProductToWishList: (
+    id: string
+  ) => Promise<{ success: boolean; message?: string; }>;
+  fetchWishListItems: (
+  ) => Promise<{ success: boolean; message?: string; data?: any }>;
 }
 
 const productStore = create<ProductStore>((set) => ({
@@ -26,6 +41,8 @@ const productStore = create<ProductStore>((set) => ({
   error: null,
   message: null,
   cartItems: [],
+  categoryItems: [],
+  selectedCategory: localStorage.getItem("selectedCategory") || "AllProducts",
 
   // ✅ Fetch all products from API
   fetchProducts: async () => {
@@ -57,26 +74,40 @@ const productStore = create<ProductStore>((set) => ({
     }
   },
 
-  addToCart: async (data: Cart)=>{
+  addToCart: async (data: Cart) => {
     try {
       set({ loading: true, error: null });
       const response = await api.post("/product/addtocart", data);
-      set({loading: false, error: null, message: response.data.message})
-      return { success: true, data: response.data, message: response.data.message }
-
+      set({ loading: false, error: null, message: response.data.message });
+      return {
+        success: true,
+        data: response.data,
+        message: response.data.message,
+      };
     } catch (error: any) {
       const message = error.response?.data?.message || "add cart failed";
       set({ loading: false, error: message });
       return { success: false, message };
     }
   },
-  fetchCartItems: async ()=>{
-     try {
+
+  fetchCartItems: async () => {
+    try {
       set({ loading: true, error: null });
       const response = await api.get("/product/cartitems");
-      set({loading: false, error: null, cartItems: response.data.items, message: response.data.message,})
-      return { success: true, data: response.data, message: response.data.message, }
+      console.log("items in store", response.data.items);
 
+      set({
+        loading: false,
+        error: null,
+        cartItems: response.data.items,
+        message: response.data.message,
+      });
+      return {
+        success: true,
+        data: response.data,
+        message: response.data.message,
+      };
     } catch (error: any) {
       const message = error.response?.data?.message || "add cart failed";
       set({ loading: false, error: message });
@@ -84,33 +115,99 @@ const productStore = create<ProductStore>((set) => ({
     }
   },
 
-  // ✅ Add/Remove product from wishlist
-  addProductToWishList: (id: string) => {
-    set((state) => {
-      const found = state.product.find((p) => p._id === id);
-      if (!found) {
-        console.warn("Product not found");
-        return state;
-      }
+  deleteCartItems: async (id: string) => {
+    try {
+      set({ loading: true, error: null });
+      const response = await api.get(`/product/deletecartitems/${id}`);
 
-      const alreadyInWishlist = state.wishListProducts.some(
-        (p) => p._id === id
-      );
-
-      let updatedWishlist;
-      if (alreadyInWishlist) {
-        // remove from wishlist
-        updatedWishlist = state.wishListProducts.filter((p) => p._id !== id);
-        console.log("Removed from wishlist:", found.name);
-      } else {
-        // add to wishlist
-        updatedWishlist = [...state.wishListProducts, found];
-        console.log("Added to wishlist:", found.name);
-      }
-
-      return { wishListProducts: updatedWishlist };
-    });
+      set({ loading: false, error: null, message: response.data.message });
+      return { success: true, message: response.data.message };
+    } catch (error: any) {
+      const message = error.response?.data?.message || "delete cart failed";
+      set({ loading: false, error: message });
+      return { success: false, message };
+    }
   },
+
+  setSelectedCategory: (cat: string) => {
+    localStorage.setItem("selectedCategory", cat);
+    set({ selectedCategory: cat });
+  },
+
+  fetchProductByCategory: async (category: string) => {
+    try {
+      set({ loading: true, error: null });
+      const response = await api.get(
+        `/product/getproductsbycategory/${category}`
+      );
+      localStorage.setItem("selectedCategory", category);
+      console.log("categoryItems in store", response.data.products);
+      set({
+        loading: false,
+        error: null,
+        message: response.data.message,
+        categoryItems: response.data.products || [],
+        selectedCategory: category,
+      });
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data,
+      };
+    } catch (error: any) {
+      const message = error.response?.data?.message || "delete cart failed";
+      set({ loading: false, error: message });
+      return { success: false, message };
+    }
+  },
+
+  //  Add/Remove product from wishlist
+  addProductToWishList: async (id: string) => {
+    try {
+      set({ loading: true, error: null });
+      const response = await api.get(`/product/addtowishlist/${id}`);
+      set({
+        loading: false,
+        error: null,
+        message: response.data.message,
+        wishListProducts: response.data.products || [],
+      });
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data,
+      };
+    } catch (error: any) {
+      const message = error.response?.data?.message || "delete cart failed";
+      set({ loading: false, error: message });
+      return { success: false, message };
+    }
+  },
+
+  fetchWishListItems: async () => {
+    try {
+      set({ loading: true, error: null });
+      const response = await api.get("/product/getwishlist");
+      console.log('get wish list in store..', response.data.wishlistItems );
+      
+      set({
+        loading: false,
+        error: null,
+        message: response.data.message,
+        wishListProducts: response.data.wishlistItems  || [],
+      });
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data,
+      };
+    } catch (error: any) {
+      const message = error.response?.data?.message || "delete cart failed";
+      set({ loading: false, error: message });
+      return { success: false, message };
+    }
+  },
+  
 }));
 
 export default productStore;

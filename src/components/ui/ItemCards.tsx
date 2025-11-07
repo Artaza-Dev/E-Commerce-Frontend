@@ -6,7 +6,8 @@ interface ItemCardProps {
   cardImage: string;
   cardTitle: string;
   cardPrice: number;
-  productId: number;
+  productId: string;
+  onWishToggle?: () => void;
 }
 
 const ItemCards: React.FC<ItemCardProps> = ({
@@ -14,15 +15,30 @@ const ItemCards: React.FC<ItemCardProps> = ({
   cardTitle,
   cardPrice,
   productId,
+  onWishToggle
 }) => {
   const navigate = useNavigate();
   const { addProductToWishList } = productStore();
   const [wish, setWish] = useState<boolean>(false);
-  function addWishProductId(id: number) {
-     setWish(!wish)
-     addProductToWishList(id)
-     
+
+  const addWishProductId = async (id: string) => {
+  try {
+    setWish((prev) => !prev);
+    const res = await addProductToWishList(id);
+
+    if (!res.success) {
+      setWish((prev) => !prev);
+      alert(res.message || "Failed to update wishlist");
+    } else {
+      console.log("Wishlist updated:", res.message);
+      if (onWishToggle) onWishToggle();
+    }
+  } catch (error) {
+    console.error("Wishlist error:", error);
+    setWish((prev) => !prev);
+    alert("Something went wrong. Please try again.");
   }
+};
 
   return (
     <div className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">

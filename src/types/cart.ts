@@ -2,6 +2,7 @@ interface CartItem {
   productId: string;
   variantId: string;
   quantity: number;
+  variantMaxQuantity: number;
 }
 
 interface Cart {

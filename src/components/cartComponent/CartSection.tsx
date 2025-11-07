@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Trash,Plus, Minus } from 'lucide-react';
-import image1 from "../../assets/mobile5.jpg";
-import image2 from "../../assets/mobile6.jpg";
+import React, { useEffect, useState } from "react";
+import { Trash, Plus, Minus } from "lucide-react";
+import productStore from "../../store/productStore";
+
 interface CartItem {
-  id: number;
+  id: string;
   name: string;
   color: string;
   rom: string;
@@ -13,40 +13,43 @@ interface CartItem {
 }
 
 const CartSection: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: "iPhone 17 Pro Max",
-      color: "Titanium Gray",
-      rom: "1TB",
-      image: image1,
-      price: 1499,
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: "iPhone 17 Pro Max",
-      color: "Natural Titanium",
-      rom: "512GB",
-      image: image2,
-      price: 1399,
-      quantity: 1,
-    },
-    
-  ]);
+  const { fetchCartItems, loading, error, deleteCartItems } = productStore();
+  const [localCart, setLocalCart] = useState<CartItem[]>([]);
 
-  //  Increase quantity
-  const increaseQuantity = (id: number) => {
-    setCartItems((prev) =>
+  // ✅ Fetch cart items from backend
+  useEffect(() => {
+    const getItems = async () => {
+      const res = (await fetchCartItems({} as any)) as any;
+      console.log("data fetch from backend..",res.data?.items);
+      
+      if (res.success && res.data?.items) {
+        const formattedItems = res.data.items.map((item: any) => ({
+          id: item._id,
+          name: item.product?.name || "Unnamed Product",
+          color: item.variant?.color || "N/A",
+          rom: item.variant?.storage || "N/A",
+          image: item.product?.images?.[0] || "",
+          price: item.variant?.price || item.product?.baseprice || 0,
+          quantity: item.quantity || 1,
+        }));
+        setLocalCart(formattedItems);
+      }
+    };
+    getItems();
+  }, [fetchCartItems, deleteCartItems]);
+  
+  // ✅ Increase quantity
+  const increaseQuantity = (id: string) => {
+    setLocalCart((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
-  //  Decrease quantity
-  const decreaseQuantity = (id: number) => {
-    setCartItems((prev) =>
+  // ✅ Decrease quantity
+  const decreaseQuantity = (id: string) => {
+    setLocalCart((prev) =>
       prev
         .map((item) =>
           item.id === id && item.quantity > 1
@@ -58,20 +61,28 @@ const CartSection: React.FC = () => {
   };
 
   //  Remove product
-  const removeItem = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const removeItem = async (id: string) => {
+     const res = await deleteCartItems(id);
+    if (res.success) {
+      setLocalCart((prev) => prev.filter((item) => item.id !== id));
+    } else {
+      alert(res.message || "Failed to delete cart item");
+    }
   };
+
+  if (loading) return <p className="text-center text-gray-500">Loading cart...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="w-full bg-white p-5 sm:p-6 rounded-2xl shadow-lg">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-         Your Cart
+        Your Cart
       </h2>
 
       {/* Scrollable Product List */}
       <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 hide-scrollbar">
-        {cartItems.length > 0 ? (
-          cartItems.map((item) => (
+        {localCart.length > 0 ? (
+          localCart.map((item) => (
             <div
               key={item.id}
               className="flex flex-col sm:flex-row items-center sm:items-start justify-between 
@@ -91,7 +102,7 @@ const CartSection: React.FC = () => {
                     {item.name}
                   </h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    ROM:{" "}
+                    Storage:{" "}
                     <span className="font-medium text-gray-800">
                       {item.rom}
                     </span>
@@ -103,7 +114,7 @@ const CartSection: React.FC = () => {
                     </span>
                   </p>
                   <p className="font-bold text-gray-900 text-lg mt-2">
-                    ${item.price}
+                    Rs {item.price.toLocaleString()}
                   </p>
                 </div>
               </div>
