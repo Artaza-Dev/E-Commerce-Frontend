@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Trash, Plus, Minus } from "lucide-react";
+import { Trash, Plus, Minus, ArrowRight } from "lucide-react";
 import productStore from "../../store/productStore";
 
 interface CartItem {
@@ -10,18 +10,23 @@ interface CartItem {
   image: string;
   price: number;
   quantity: number;
+  variantQuantity: number;
+  productId: string;
+  variantId: string;
 }
 
+
 const CartSection: React.FC = () => {
-  const { fetchCartItems, loading, error, deleteCartItems } = productStore();
+  const { fetchCartItems, loading, error, deleteCartItems, addToCart, addItemsToSummary } =
+    productStore();
   const [localCart, setLocalCart] = useState<CartItem[]>([]);
 
-  // ✅ Fetch cart items from backend
+  // Fetch cart items from backend
   useEffect(() => {
     const getItems = async () => {
       const res = (await fetchCartItems({} as any)) as any;
-      console.log("data fetch from backend..",res.data?.items);
-      
+      console.log("data fetch from backend..", res.data?.items);
+
       if (res.success && res.data?.items) {
         const formattedItems = res.data.items.map((item: any) => ({
           id: item._id,
@@ -31,24 +36,63 @@ const CartSection: React.FC = () => {
           image: item.product?.images?.[0] || "",
           price: item.variant?.price || item.product?.baseprice || 0,
           quantity: item.quantity || 1,
+          // use these attributes to increase and decrease items in cart.
+          variantQuantity: item.variant?.quantity,
+          productId: item.product?._id,
+          variantId: item.variant?._id,
         }));
         setLocalCart(formattedItems);
       }
     };
     getItems();
   }, [fetchCartItems, deleteCartItems]);
-  
-  // ✅ Increase quantity
-  const increaseQuantity = (id: string) => {
+
+  // (limit the quantity or increase)
+  const increaseQuantity = async (
+    id: string,
+    productId: string,
+    variantId: string,
+    variantQuantity: number,
+    quantity: number
+  ) => {
     setLocalCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
+      prev.map((item) => {
+        if (item.id === id) {
+          if (item.quantity < item.variantQuantity) {
+            return { ...item, quantity: item.quantity + 1 };
+          } else {
+            alert(`Only ${item.variantQuantity} items available in stock`);
+            return item;
+          }
+        }
+        return item;
+      })
     );
+    console.log("items increased", localCart);
+
+    try {
+      const newQuantity = quantity + 1;
+      if (newQuantity <= variantQuantity) {
+        const res = await addToCart({
+          productId,
+          variantId,
+          quantity: 1,
+          variantMaxQuantity: variantQuantity,
+        } as any);
+        console.log("Cart updated:", res.message);
+      }
+    } catch (err) {
+      console.error("Error updating cart:", err);
+    }
   };
 
-  // ✅ Decrease quantity
-  const decreaseQuantity = (id: string) => {
+  // Decrease quantity
+  const decreaseQuantity = async (
+    id: string,
+    productId: string,
+    variantId: string,
+    variantQuantity: number
+  ) => {
     setLocalCart((prev) =>
       prev
         .map((item) =>
@@ -58,19 +102,34 @@ const CartSection: React.FC = () => {
         )
         .filter((item) => item.quantity > 0)
     );
+    try {
+      const res = await addToCart({
+        productId,
+        variantId,
+        quantity: -1,
+        variantMaxQuantity: variantQuantity,
+      } as any);
+      console.log("Quantity decreased:", res.message);
+    } catch (err) {
+      console.error("Error decreasing cart quantity:", err);
+    }
   };
 
   //  Remove product
   const removeItem = async (id: string) => {
-     const res = await deleteCartItems(id);
+    const res = await deleteCartItems(id);
     if (res.success) {
       setLocalCart((prev) => prev.filter((item) => item.id !== id));
     } else {
       alert(res.message || "Failed to delete cart item");
     }
   };
-
-  if (loading) return <p className="text-center text-gray-500">Loading cart...</p>;
+  // Conform products to view summery
+    const conformProductsHandler = (localCart: CartItem[])=>{
+        addItemsToSummary(localCart)
+    }
+  if (loading)
+    return <p className="text-center text-gray-500">Loading cart...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
@@ -123,7 +182,14 @@ const CartSection: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mt-4 sm:mt-0">
                 <div className="flex items-center bg-gray-200 rounded-full overflow-hidden">
                   <button
-                    onClick={() => decreaseQuantity(item.id)}
+                    onClick={() =>
+                      decreaseQuantity(
+                        item.id,
+                        item.productId,
+                        item.variantId,
+                        item.variantQuantity
+                      )
+                    }
                     className="p-2 text-gray-700 hover:bg-gray-300 transition-all cursor-pointer"
                   >
                     <Minus size={14} />
@@ -132,7 +198,15 @@ const CartSection: React.FC = () => {
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => increaseQuantity(item.id)}
+                    onClick={() =>
+                      increaseQuantity(
+                        item.id,
+                        item.productId,
+                        item.variantId,
+                        item.variantQuantity,
+                        item.quantity
+                      )
+                    }
                     className="p-2 text-gray-700 hover:bg-gray-300 transition-all cursor-pointer"
                   >
                     <Plus size={14} />
@@ -150,10 +224,14 @@ const CartSection: React.FC = () => {
           ))
         ) : (
           <p className="text-center text-gray-600 mt-10">
-            Your cart is empty 🛍️
+            Your cart is empty ...
           </p>
         )}
       </div>
+      <button className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer" onClick={()=> conformProductsHandler(localCart)}>
+        Conform products
+        <ArrowRight />
+      </button>
     </div>
   );
 };

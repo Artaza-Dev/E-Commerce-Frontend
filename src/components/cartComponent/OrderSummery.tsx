@@ -1,60 +1,74 @@
-import { Tag, ArrowRight } from 'lucide-react';
-
-interface SummaryProps {
-  subtotal: number;
-  discountPercentage: number;
-  deliveryFee: number;
-}
-
-const summaryData: SummaryProps = {
-  subtotal: 565,
-  discountPercentage: 20,
-  deliveryFee: 15,
-};
-
+import { Tag, ArrowRight } from "lucide-react";
+import productStore from "../../store/productStore";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 const OrderSummary: React.FC = () => {
-  const { subtotal, discountPercentage, deliveryFee } = summaryData;
+  const { summaryItems } = productStore();
+  const navigate = useNavigate();
 
-  // Calculate Discount Amount
-  const discountAmount = subtotal * (discountPercentage / 100);
+  // Calculate summary values dynamically
+  const { subtotal, deliveryFee, totalItems, total } = useMemo(() => {
+    const subtotal = summaryItems.reduce(
+      (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
+      0
+    );
 
-  // Calculate Total
-  const total = subtotal - discountAmount + deliveryFee;
+    const deliveryFee = subtotal > 0 ? summaryItems.length * 200 : 0;
+    const totalItems = summaryItems.reduce(
+      (acc, item) => acc + item.quantity,
+      0
+    );
+    const total = subtotal + deliveryFee;
+
+    return { subtotal, deliveryFee, totalItems, total };
+  }, [summaryItems]);
+
+  const orderHander = (totalItems: number)=>{
+    if(totalItems > 0){
+      navigate('/checkout')
+    }else{
+      alert('No items found')
+    }
+  }
 
   return (
-   <div className="w-full bg-gray-50 rounded-2xl shadow-lg p-5 sm:p-6">
+    <div className="w-full bg-gray-50 rounded-2xl shadow-lg p-5 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-5 border-b pb-3">
-         Order Summary
+        Order Summary
       </h2>
 
       {/* Price Details */}
       <div className="space-y-4 text-gray-800">
         <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span className="font-semibold">${subtotal.toFixed(0)}</span>
+          <span>Total Items</span>
+          <span className="font-semibold">{totalItems || 0}</span>
         </div>
 
         <div className="flex justify-between">
-          <span>Discount (-{discountPercentage}%)</span>
-          <span className="font-semibold text-red-500">
-            -${discountAmount.toFixed(0)}
-          </span>
+          <span>Subtotal</span>
+          <span className="font-semibold">Rs {subtotal.toFixed(0) || 0}</span>
         </div>
 
         <div className="flex justify-between">
           <span>Delivery Fee</span>
-          <span className="font-semibold">${deliveryFee.toFixed(0)}</span>
+          <span className="font-semibold">
+            Rs {deliveryFee.toFixed(0) || 0}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>Discount</span>
+          <span className="font-semibold">Rs -{0}</span>
         </div>
 
         <div className="border-t pt-4 flex justify-between text-lg font-bold text-gray-900">
           <span>Total</span>
-          <span>${total.toFixed(0)}</span>
+          <span>Rs {total.toFixed(0) || 0}</span>
         </div>
       </div>
 
       {/* Promo Code */}
       <div className="flex gap-2 mt-6">
-        <div className="flex items-center flex-grow bg-white border-zinc-700 rounded-lg p-3 shadow-sm">
+        <div className="flex items-center grow bg-white border-zinc-700 rounded-lg p-3 shadow-sm">
           <Tag className="text-gray-500 mr-2" size={20} />
           <input
             type="text"
@@ -69,8 +83,11 @@ const OrderSummary: React.FC = () => {
       </div>
 
       {/* Checkout Button */}
-      <button className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer">
-        Go to Checkout
+      <button
+        className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer"
+        onClick={()=>orderHander(totalItems)}
+      >
+       ({totalItems}) Go to Checkout
         <ArrowRight />
       </button>
     </div>

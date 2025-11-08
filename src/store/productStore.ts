@@ -12,7 +12,9 @@ interface ProductStore {
   error: string | null;
   cartItems: any[];
   categoryItems: any[];
+  summaryItems: any[];
   selectedCategory: string;
+  addItemsToSummary: (data: any[]) => void;
   setSelectedCategory: (cat: string) => void;
   fetchProductByCategory: (
     id: string
@@ -28,9 +30,12 @@ interface ProductStore {
   ) => Promise<{ success: boolean; message?: string }>;
   addProductToWishList: (
     id: string
-  ) => Promise<{ success: boolean; message?: string; }>;
-  fetchWishListItems: (
-  ) => Promise<{ success: boolean; message?: string; data?: any }>;
+  ) => Promise<{ success: boolean; message?: string }>;
+  fetchWishListItems: () => Promise<{
+    success: boolean;
+    message?: string;
+    data?: any;
+  }>;
 }
 
 const productStore = create<ProductStore>((set) => ({
@@ -42,9 +47,19 @@ const productStore = create<ProductStore>((set) => ({
   message: null,
   cartItems: [],
   categoryItems: [],
+  summaryItems: [],
   selectedCategory: localStorage.getItem("selectedCategory") || "AllProducts",
 
-  // ✅ Fetch all products from API
+  addItemsToSummary: (data: any[]) => {
+    set(() => {
+      const summary = data;
+      console.log('summary data in store', summary);
+      
+      return { summaryItems: summary };
+    });
+  },
+
+  // Fetch all products from API
   fetchProducts: async () => {
     try {
       set({ loading: true, error: null });
@@ -59,7 +74,7 @@ const productStore = create<ProductStore>((set) => ({
     }
   },
 
-  // ✅ Fetch single product by ID
+  // Fetch single product by ID
   findProduct: async (id: string) => {
     try {
       set({ loading: true, error: null });
@@ -78,6 +93,8 @@ const productStore = create<ProductStore>((set) => ({
     try {
       set({ loading: true, error: null });
       const response = await api.post("/product/addtocart", data);
+      console.log("add to cart response in stroe", response.data);
+
       set({ loading: false, error: null, message: response.data.message });
       return {
         success: true,
@@ -188,13 +205,11 @@ const productStore = create<ProductStore>((set) => ({
     try {
       set({ loading: true, error: null });
       const response = await api.get("/product/getwishlist");
-      console.log('get wish list in store..', response.data.wishlistItems );
-      
       set({
         loading: false,
         error: null,
         message: response.data.message,
-        wishListProducts: response.data.wishlistItems  || [],
+        wishListProducts: response.data.wishlistItems || [],
       });
       return {
         success: true,
@@ -207,7 +222,6 @@ const productStore = create<ProductStore>((set) => ({
       return { success: false, message };
     }
   },
-  
 }));
 
 export default productStore;
