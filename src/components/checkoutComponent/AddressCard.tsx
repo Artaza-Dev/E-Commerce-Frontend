@@ -1,7 +1,16 @@
 import React, { useEffect } from "react";
 import { MapPin, Phone } from "lucide-react";
 import addressStore from "../../store/addressStore";
-const AddressCard: React.FC = () => {
+
+interface AddressCardProps {
+  setAddress: (address: any) => void;
+  selectedAddressId: string;
+}
+
+const AddressCard: React.FC<AddressCardProps> = ({
+  setAddress,
+  selectedAddressId,
+}) => {
   const { addresses, fetchaddress } = addressStore();
 
   useEffect(() => {
@@ -13,17 +22,20 @@ const AddressCard: React.FC = () => {
   console.log("data in addresses card compo", addresses);
 
   // Dummy button handler
-  const onUseAddress = () => {
-    alert("This address has been selected");
-  };
 
   return (
     <>
       {addresses?.length > 0 ? (
         addresses?.map((val, index) => {
+          const isSelected = val._id === selectedAddressId;
           return (
             <div
-              className="bg-white border border-gray-300 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 max-w-md w-full"
+              className={`bg-white border rounded-2xl p-6 shadow-md transition-all duration-300 max-w-md w-full
+        ${
+          isSelected
+            ? "border-black shadow-lg"
+            : "border-gray-300 hover:shadow-lg"
+        }`}
               key={index}
             >
               {/* Header */}
@@ -32,10 +44,17 @@ const AddressCard: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {val?.fullName}
                 </h3>
-                {val?.isDefault && (
-                  <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded">
-                   Default
+                {isSelected ? (
+                  <span className="bg-black text-white text-xs font-medium px-2.5 py-1 rounded">
+                    Used
                   </span>
+                ) : (
+                  <> </>
+                  // val?.isDefault && (
+                  //   <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded">
+                  //     Default
+                  //   </span>
+                  // )
                 )}
               </div>
 
@@ -60,16 +79,23 @@ const AddressCard: React.FC = () => {
 
               {/* Button */}
               <button
-                onClick={onUseAddress}
-                className="w-full bg-black text-white font-medium py-2.5 px-4 rounded-lg hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
+                onClick={() => setAddress(val)}
+                className={`w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 cursor-pointer
+          ${
+            isSelected
+              ? "bg-gray-400 text-white"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
               >
-                Use This Address
+                {isSelected ? "Selected" : "Use This Address"}
               </button>
             </div>
           );
         })
       ) : (
-        <p className="text-center text-gray-600 mt-10">No address added yet...</p>
+        <p className="text-center text-gray-600 mt-10">
+          No address added yet...
+        </p>
       )}
     </>
   );

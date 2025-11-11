@@ -7,8 +7,10 @@ interface PrivateRouteProps {
 
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
   const token = localStorage.getItem('token');
-  if (!token) {
-    console.log("Redirecting to login...");
+  const expiry = localStorage.getItem("tokenExpiry");
+  if (!token || !expiry || Date.now() > Number(expiry)) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("tokenExpiry");
     return <Navigate to="/login" replace />;
   }
 

@@ -14,6 +14,7 @@ interface ProductStore {
   categoryItems: any[];
   summaryItems: any[];
   selectedCategory: string;
+  discount: number | null;
   addItemsToSummary: (data: any[]) => void;
   setSelectedCategory: (cat: string) => void;
   fetchProductByCategory: (
@@ -36,6 +37,9 @@ interface ProductStore {
     message?: string;
     data?: any;
   }>;
+   applyCouponCode: (
+    code: string
+  ) => Promise<{ success: boolean; message?: string }>;
 }
 
 const productStore = create<ProductStore>((set) => ({
@@ -49,6 +53,7 @@ const productStore = create<ProductStore>((set) => ({
   categoryItems: [],
   summaryItems: [],
   selectedCategory: localStorage.getItem("selectedCategory") || "AllProducts",
+  discount:  null,
 
   addItemsToSummary: (data: any[]) => {
     set(() => {
@@ -210,6 +215,28 @@ const productStore = create<ProductStore>((set) => ({
         error: null,
         message: response.data.message,
         wishListProducts: response.data.wishlistItems || [],
+      });
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data,
+      };
+    } catch (error: any) {
+      const message = error.response?.data?.message || "delete cart failed";
+      set({ loading: false, error: message });
+      return { success: false, message };
+    }
+  },
+  applyCouponCode: async (code: string) => {
+    try {
+      set({ loading: true, error: null });
+      const response = await api.post("/coupon/applycoupon", { code });
+
+      set({
+        loading: false,
+        error: null,
+        message: response.data.message,
+        discount: response.data.discount || null,
       });
       return {
         success: true,

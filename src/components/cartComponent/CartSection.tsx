@@ -15,12 +15,16 @@ interface CartItem {
   variantId: string;
 }
 
-
 const CartSection: React.FC = () => {
-  const { fetchCartItems, loading, error, deleteCartItems, addToCart, addItemsToSummary } =
-    productStore();
+  const {
+    fetchCartItems,
+    loading,
+    deleteCartItems,
+    addToCart,
+    addItemsToSummary,
+  } = productStore();
   const [localCart, setLocalCart] = useState<CartItem[]>([]);
-
+  const [isActive, setIsActive] = useState<boolean>(true);
   // Fetch cart items from backend
   useEffect(() => {
     const getItems = async () => {
@@ -125,13 +129,12 @@ const CartSection: React.FC = () => {
     }
   };
   // Conform products to view summery
-    const conformProductsHandler = (localCart: CartItem[])=>{
-        addItemsToSummary(localCart)
-    }
+  const conformProductsHandler = (localCart: CartItem[]) => {
+    addItemsToSummary(localCart);
+    setIsActive(false);
+  };
   if (loading)
     return <p className="text-center text-gray-500">Loading cart...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
-
   return (
     <div className="w-full bg-white p-5 sm:p-6 rounded-2xl shadow-lg">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
@@ -183,6 +186,7 @@ const CartSection: React.FC = () => {
                 <div className="flex items-center bg-gray-200 rounded-full overflow-hidden">
                   <button
                     onClick={() =>
+                      isActive &&
                       decreaseQuantity(
                         item.id,
                         item.productId,
@@ -190,15 +194,29 @@ const CartSection: React.FC = () => {
                         item.variantQuantity
                       )
                     }
-                    className="p-2 text-gray-700 hover:bg-gray-300 transition-all cursor-pointer"
+                    disabled={!isActive}
+                    className={`p-2 transition-all ${
+                      isActive
+                        ? "text-gray-700 hover:bg-gray-300 cursor-pointer"
+                        : "text-gray-400 cursor-not-allowed opacity-50"
+                    }`}
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="px-4 font-medium text-gray-800">
+
+                  {/* Quantity Display */}
+                  <span
+                    className={`px-4 font-medium ${
+                      isActive ? "text-gray-800" : "text-gray-400"
+                    }`}
+                  >
                     {item.quantity}
                   </span>
+
+                  {/* Increase Button */}
                   <button
                     onClick={() =>
+                      isActive &&
                       increaseQuantity(
                         item.id,
                         item.productId,
@@ -207,15 +225,25 @@ const CartSection: React.FC = () => {
                         item.quantity
                       )
                     }
-                    className="p-2 text-gray-700 hover:bg-gray-300 transition-all cursor-pointer"
+                    disabled={!isActive}
+                    className={`p-2 transition-all ${
+                      isActive
+                        ? "text-gray-700 hover:bg-gray-300 cursor-pointer"
+                        : "text-gray-400 cursor-not-allowed opacity-50"
+                    }`}
                   >
                     <Plus size={14} />
                   </button>
                 </div>
 
                 <button
-                  onClick={() => removeItem(item.id)}
-                  className="text-red-500 hover:text-red-700 transition-all cursor-pointer"
+                  onClick={() => isActive && removeItem(item.id)}
+                  disabled={!isActive}
+                  className={`transition-all ${
+                    isActive
+                      ? "text-red-500 hover:text-red-700 cursor-pointer"
+                      : "text-gray-400 cursor-not-allowed opacity-50"
+                  }`}
                 >
                   <Trash size={20} />
                 </button>
@@ -228,7 +256,10 @@ const CartSection: React.FC = () => {
           </p>
         )}
       </div>
-      <button className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer" onClick={()=> conformProductsHandler(localCart)}>
+      <button
+        className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer"
+        onClick={() => conformProductsHandler(localCart)}
+      >
         Conform products
         <ArrowRight />
       </button>

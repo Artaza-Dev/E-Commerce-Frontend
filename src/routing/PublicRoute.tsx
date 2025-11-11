@@ -11,8 +11,14 @@ const PublicRoute: React.FC<PublicRouteProps> = ({
   restricted = false,
 }) => {
   const token = localStorage.getItem("token");
-  console.log("token in public route", token);
-  if (restricted && token) {
+  const expiry = localStorage.getItem("tokenExpiry");
+  const isExpired = expiry && Date.now() > Number(expiry);
+
+  if (isExpired) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("tokenExpiry");
+  }
+  if (restricted && token && !isExpired) {
     return <Navigate to="/" replace />;
   }
   return <>{children}</>;

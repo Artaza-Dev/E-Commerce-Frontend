@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from "react";
 import productStore from "../../store/productStore";
 import MainLayout from "../../components/layout/MainLayout";
-import AddAddress from "../../components/checkoutComponent/AddAddress";
 import AddressCard from "../../components/checkoutComponent/AddressCard";
-
+import { useNavigate } from "react-router-dom";
+import orderStore from "../../store/orderStore";
 interface CartItem {
   id: string;
   name: string;
@@ -18,9 +18,12 @@ interface CartItem {
 }
 
 const CheckoutPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>("saveAddress");
-  const { fetchCartItems, deleteCartItems } = productStore();
+  const navigate = useNavigate();
+  const { fetchCartItems, deleteCartItems, discount } = productStore();
+  const { createOrder } = orderStore();
   const [localCart, setLocalCart] = useState<CartItem[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<string>("");
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
 
   // Fetch cart items from backend
   useEffect(() => {
@@ -49,7 +52,7 @@ const CheckoutPage: React.FC = () => {
   }, [fetchCartItems, deleteCartItems]);
 
   // Calculate summary values dynamically
-  const { subtotal, deliveryFee, totalItems, total } = useMemo(() => {
+  const { subtotal, deliveryFee, totalItems, discountedTotal } = useMemo(() => {
     const subtotal = localCart.reduce(
       (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
       0
@@ -57,10 +60,51 @@ const CheckoutPage: React.FC = () => {
 
     const deliveryFee = localCart.length > 0 ? localCart.length * 200 : 0;
     const totalItems = localCart.reduce((acc, item) => acc + item.quantity, 0);
-    const total = subtotal + deliveryFee;
 
-    return { subtotal, deliveryFee, totalItems, total };
+    const total = subtotal + deliveryFee;
+    const discountAmount = (total * (discount || 0)) / 100;
+    const discountedTotal = total - discountAmount;
+
+    return { subtotal, deliveryFee, totalItems, total, discountedTotal };
   }, [localCart]);
+
+  // use Address
+  const onUseAddress = (address : any) => {
+    setSelectedAddress(address);
+    setSelectedAddressId(address._id)
+  };
+
+  // Place order handler
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress) {
+      alert("Please select an address before placing the order");
+      return;
+    }
+    const orderData = {
+      items: localCart.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        name: item.name,
+        image: item.image,
+        color: item.color,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      shippingAddress: selectedAddress,
+      totalAmount: discountedTotal,
+      discountAmount: subtotal + deliveryFee - discountedTotal,
+      paymentMethod: "COD",
+    };
+    
+    
+    const result = await createOrder(orderData as any);
+    if (result.success) {
+      alert("Order placed successfully!");
+      navigate("/ordersuccess");
+    } else {
+      alert(result.message || "Failed to place order!");
+    }
+  };
 
   return (
     <>
@@ -72,43 +116,13 @@ const CheckoutPage: React.FC = () => {
               {/* LEFT SECTION - FORM */}
               <div className="w-full lg:col-span-2 bg-white rounded-2xl shadow-md p-5 sm:p-8 space-y-8 transition-all duration-300">
                 {/* Tabs Header */}
-                <div className="w-full flex flex-wrap flex-col sm:flex-row justify-center sm:justify-start items-center gap-4 sm:gap-10 border-b border-gray-200 pb-3">
-                  {/* Add Shipping Address Tab */}
-                  <button
-                    onClick={() => setActiveTab("saveAddress")}
-                    className={`relative text-sm sm:text-lg font-semibold transition-all duration-300 pb-2 cursor-pointer
-      ${
-        activeTab === "saveAddress"
-          ? "text-black after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-black"
-          : "text-gray-500 hover:text-black"
-      }`}
-                  >
-                    Add Shipping Address
-                  </button>
-
-                  {/* Saved Address Tab */}
-                  <button
-                    onClick={() => setActiveTab("reviews")}
-                    className={`relative text-sm sm:text-lg font-semibold transition-all duration-300 pb-2 cursor-pointer
-      ${
-        activeTab !== "saveAddress"
-          ? "text-black after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-black"
-          : "text-gray-500 hover:text-black"
-      }`}
-                  >
-                    Saved Address
-                  </button>
+                <div className="w-full flex justify-between items-center">
+                  <div className="text-2xl font-bold">Your Address</div>
+                  <div><button className="w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 cursor-pointer bg-black text-white hover:bg-gray-700" onClick={()=> navigate('/createaddress')}>Add New Address</button></div>
                 </div>
-
                 {/* Tab Content */}
                 <div className="w-full bg-gray-50 rounded-xl shadow-inner px-5 sm:px-8 py-6 transition-all duration-500 flex flex-col items-center gap-3">
-                  {activeTab === "saveAddress" ? (
-                    <AddAddress />
-                  ) : (
-                    // <div className="w-full bg-red-300 bg-gray-50 rounded-xl shadow-inner flex justify-center items-center py-10 transition-all duration-500">
-                    <AddressCard />
-                    // </div>
-                  )}
+                    <AddressCard setAddress={onUseAddress} selectedAddressId={selectedAddressId}/>
                 </div>
               </div>
 
@@ -164,20 +178,20 @@ const CheckoutPage: React.FC = () => {
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Discount</span>
-                      <span>Rs -{0}</span>
+                      <span>{discount || 0}%</span>
                     </div>
 
                     <div className="pt-2 border-t border-gray-200">
                       <div className="flex justify-between text-lg font-bold text-black">
                         <span>Total</span>
-                        <span>Rs {total.toFixed(0)}</span>
+                        <span>Rs {discountedTotal.toFixed(0)}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Complete Order Button */}
-                  <button className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors cursor-pointer">
-                    Proceed to pay
+                  <button className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors cursor-pointer" onClick={handlePlaceOrder}>
+                    Place Order
                   </button>
 
                   <p className="text-xs text-gray-500 text-center mt-4">

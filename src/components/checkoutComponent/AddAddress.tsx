@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import addressStore from "../../store/addressStore";
+import { useNavigate } from "react-router-dom";
 interface UserAddress {
   fullName: string;
   phone: string;
@@ -12,6 +13,7 @@ interface UserAddress {
 
 const AddAddress: React.FC = () => {
   const { createAddress } = addressStore();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<UserAddress>({
     fullName: "",
     phone: "",
@@ -43,15 +45,17 @@ const AddAddress: React.FC = () => {
         country: "",
       });
       alert(" Address saved successfully!");
+      navigate("/checkout")
     } else {
       alert(result.message || "Login failed");
     }
   };
 
   return (
+    <div className="w-full bg-gray-50 rounded-xl shadow-inner px-5 sm:px-8 py-6 transition-all duration-500 flex flex-col items-center gap-3">
     <form
       onSubmit={handleSubmit}
-      className="bg-white w-full rounded-2xl shadow-md p-6 sm:p-8 space-y-4"
+      className="bg-white w-full md:w-[80%] rounded-2xl shadow-md p-6 sm:p-8 space-y-4"
     >
       <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
         Shipping Address
@@ -177,6 +181,7 @@ const AddAddress: React.FC = () => {
         Save Address
       </button>
     </form>
+    </div>
   );
 };
 

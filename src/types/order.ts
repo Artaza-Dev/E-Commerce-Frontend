@@ -2,6 +2,8 @@ interface OrderItem {
   productId: string;
   variantId?: string;
   quantity: number;
+  name: string;
+  image: string;
   price: number;
 }
 interface Address {
@@ -23,8 +25,8 @@ interface Order {
   shippingAddress: Address;
   totalAmount: number;
   discountAmount?: number;
-  couponCode?: string;
-  paymentMethod: "COD" | "Card" | "Bank";
+  paymentMethod: "COD";
+  deliveryDate: string;
   status: "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
 }
 
