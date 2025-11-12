@@ -31,8 +31,6 @@ const HeroSection = () => {
               that seamlessly blend innovation with style.
             </p>
 
-            {/* Features List */}
-
             {/* Button */}
             <div className="mb-10 flex justify-center lg:justify-start">
               <NavLink to="/categories">

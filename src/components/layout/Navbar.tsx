@@ -1,8 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Heart, ShoppingCart, CircleUserRound, Menu,  X } from 'lucide-react';
+import { Heart, ShoppingCart, CircleUserRound, Menu, X } from "lucide-react";
+import userStore from "../../store/userStore";
+import { toast } from "react-toastify";
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { user, logoutUser } = userStore();
+  useEffect(() => {
+    const fetchUser = async () => {
+      await user;
+      console.log("user in navbar", user);
+    };
+    fetchUser();
+  }, [user]);
+
+  const logoutHandler = async () => {
+    try {
+      const result = await logoutUser();
+      if (result.success) {
+        toast.success("Logout successful!");
+      } else {
+        toast.error(result.message || "Logout failed!");
+      }
+    } catch (err) {
+      toast.error("Something went wrong during logout!");
+    }
+  };
 
   return (
     <>
@@ -59,8 +83,9 @@ function Navbar() {
             <button
               aria-label="User Account"
               className="p-2 hover:text-zinc-400 transition cursor-pointer"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
             >
-              <CircleUserRound />
+              {userMenuOpen && user?.email ? <X /> : <CircleUserRound />}
             </button>
 
             {/* Mobile Menu Button */}
@@ -115,6 +140,42 @@ function Navbar() {
           >
             Cart
           </NavLink>
+        </div>
+
+        {/* User menu for all screen */}
+        <div
+          className={`absolute top-20 right-4 bg-white w-64 shadow-lg flex flex-col space-y-4 px-4 py-2 text-sm font-medium rounded-xl overflow-hidden transition-all duration-300 ease-in-out ${
+            userMenuOpen && user?.email
+              ? "max-h-64 opacity-100"
+              : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="w-full max-w-xs bg-linear-to-r from-gray-100 to-gray-50 shadow-lg rounded-2xl flex flex-col items-center justify-center p-6 space-y-3">
+            <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-2xl font-bold text-white">
+              {user?.username?.[0]?.toUpperCase()}
+            </div>
+
+            {/* Username */}
+            <p className="text-xl font-bold text-gray-800">{user?.username}</p>
+
+            {/* Email */}
+            <p className="text-sm font-medium text-gray-600 truncate w-full text-center">
+              {user?.email}
+            </p>
+
+            {/* Logout Button */}
+            <button
+              className="group relative px-10 py-1.5 bg-black text-white text-md font-semibold rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+              onClick={logoutHandler}
+            >
+              {/* Shine effect */}
+              <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+
+              <span className="relative flex items-center space-x-2">
+                <span>Logout</span>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </>

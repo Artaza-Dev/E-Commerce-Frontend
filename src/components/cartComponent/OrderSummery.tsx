@@ -2,6 +2,8 @@ import { Tag, ArrowRight } from "lucide-react";
 import productStore from "../../store/productStore";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 const OrderSummary: React.FC = () => {
   const { summaryItems, applyCouponCode, discount } = productStore();
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ const OrderSummary: React.FC = () => {
         window.location.reload();
       }, 200);
     } else {
-      alert("No items found");
+      toast.error("No items found");
     }
   };
 
@@ -41,9 +43,9 @@ const OrderSummary: React.FC = () => {
     e.preventDefault();
     const result = await applyCouponCode(code as string);
     if (result?.success) {
-      alert("Coupon applied successfully!");
+      toast.success("Coupon applied successfully!");
     } else {
-      alert(result?.message || "Invalid or expired coupon code!");
+      toast.error(result?.message || "Invalid or expired coupon code!");
     }
   };
 
@@ -62,7 +64,7 @@ const OrderSummary: React.FC = () => {
 
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span className="font-semibold">Rs {subtotal.toFixed(0) || 0}</span>
+          <span className="font-semibold">Rs {subtotal.toLocaleString() || 0}</span>
         </div>
 
         <div className="flex justify-between">
@@ -79,7 +81,7 @@ const OrderSummary: React.FC = () => {
 
         <div className="border-t pt-4 flex justify-between text-lg font-bold text-gray-900">
           <span>Total</span>
-          <span>Rs {discountedTotal.toFixed(0) || 0}</span>
+          <span>Rs {discountedTotal.toLocaleString() || 0}</span>
         </div>
       </div>
 

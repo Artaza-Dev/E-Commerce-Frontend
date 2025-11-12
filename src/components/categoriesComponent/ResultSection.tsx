@@ -1,6 +1,8 @@
 import ItemCards from "../ui/ItemCards";
 import productStore from "../../store/productStore";
 import { useEffect, useState } from "react";
+import Loader from "react-js-loader";
+
 interface CardItem {
   images: string[];
   name: string;
@@ -9,14 +11,17 @@ interface CardItem {
 }
 function ResultSection() {
   const [items, setItems] = useState<CardItem[]>([]);
-  const { categoryItems, fetchProductByCategory, selectedCategory } = productStore();
+  const { categoryItems, fetchProductByCategory, selectedCategory, loading } =
+    productStore();
   useEffect(() => {
     const init = async () => {
-      const cat = selectedCategory || localStorage.getItem("selectedCategory") || "AllProducts";
+      const cat =
+        selectedCategory ||
+        localStorage.getItem("selectedCategory") ||
+        "AllProducts";
       if (!Array.isArray(categoryItems) || categoryItems.length === 0) {
         await fetchProductByCategory(cat);
       }
-      
     };
     init();
   }, []);
@@ -36,26 +41,31 @@ function ResultSection() {
 
         {/* Product Grid */}
         <div className="pt-4">
-          {categoryItems?.length > 0 ? (
-            <>
-              <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {items?.map((val, index) => (
-                  <ItemCards
-                    key={index}
-                    cardImage={val.images[0]}
-                    cardTitle={val?.name}
-                    cardPrice={val?.baseprice}
-                    productId={val?._id}
-                  />
-                ))}
-              </div>
-            </>
+          {loading ? (
+            <div className="flex justify-center items-center my-5 min-h-[300px]">
+              <Loader
+                type="spinner-default"
+                bgColor="#000000"
+                color="#1D4ED8"
+                size={90}
+              />
+            </div>
+          ) : items?.length > 0 ? (
+            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {items.map((val, index) => (
+                <ItemCards
+                  key={index}
+                  cardImage={val.images[0]}
+                  cardTitle={val.name}
+                  cardPrice={val.baseprice}
+                  productId={val._id}
+                />
+              ))}
+            </div>
           ) : (
-            <>
-              <p className="text-center text-md md:text-3xl font-bold text-gray-600 mt-10">
-                No product found in this category...
-              </p>
-            </>
+            <p className="text-center text-md md:text-3xl font-bold text-gray-600 mt-10">
+              No product found in this category...
+            </p>
           )}
         </div>
       </div>

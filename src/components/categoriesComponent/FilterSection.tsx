@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { X, SlidersHorizontal } from "lucide-react";
 import productStore from "../../store/productStore";
+import { toast } from "react-toastify";
+
 function FilterSection() {
   const { fetchProductByCategory, selectedCategory, setSelectedCategory } =
     productStore();
@@ -9,7 +11,7 @@ function FilterSection() {
     setSelectedCategory(category);
     let res = await fetchProductByCategory(category);
     if (!res.success) {
-      alert(res.message || "Failed to get items by category");
+      toast.error(res.message || "Failed to get items by category");
     }
     setIsOpen(false);
   };

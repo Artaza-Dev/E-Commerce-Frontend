@@ -1,4 +1,3 @@
-// src/pages/auth/Signup.tsx
 import React from "react";
 import type {
   ChangeEvent,
@@ -12,6 +11,7 @@ import Loader from "react-js-loader";
 import Input from "../../components/ui/Input";
 import CredientialButton from "../../components/ui/CredientialButton";
 import userStore from "../../store/userStore";
+import { toast } from "react-toastify";
 
 // Define types for errors
 interface FormErrors {
@@ -51,46 +51,50 @@ const Signup: React.FC = () => {
   // show hide password
   const viewHandler = (): void => setShowPassword((s) => !s);
 
-  // signupHandler accepts either a form submit event OR a button click event
   const signupHandler = async (
     e: FormEvent<HTMLFormElement> | ReactMouseEvent<HTMLButtonElement>
   ): Promise<void> => {
-    // prevent default for form submit or button click
     if ("preventDefault" in e) e.preventDefault();
     setLoading(true);
     setErrors({});
 
     try {
-      // validate
       await signupSchema.validate(
         { username, email, password },
         { abortEarly: false }
       );
+
       const data: UserData = { username, email, password };
       const result = await registerUser(data);
+
       if (result.success) {
-        console.log("Register successful:", result.data);
         setUsername("");
         setEmail("");
         setPassword("");
         setErrors({});
+        toast.success("Account created successfully!");
         navigate("/login");
       } else {
-        alert(result.message || "Registration failed");
+        // API error
+        toast.error(result.message || "Registration failed");
       }
     } catch (err: any) {
-      // collect yup validation errors
-      const valErrors: FormErrors = {};
+      // Yup validation errors
       if (err?.inner && Array.isArray(err.inner)) {
+        const valErrors: FormErrors = {};
         err.inner.forEach((vi: any) => {
-          if (vi.path) valErrors[vi.path as keyof FormErrors] = vi.message;
+          if (vi.path) {
+            valErrors[vi.path as keyof FormErrors] = vi.message;
+            toast.error(vi.message);
+          }
         });
+        setErrors(valErrors);
       } else if (err?.path) {
-        valErrors[err.path as keyof FormErrors] = err.message;
+        setErrors({ [err.path]: err.message });
+        toast.error(err.message);
       } else {
-        console.error(err);
+        toast.error("Something went wrong!");
       }
-      setErrors(valErrors);
     } finally {
       setLoading(false);
     }

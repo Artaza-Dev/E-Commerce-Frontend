@@ -4,6 +4,8 @@ import MainLayout from "../../components/layout/MainLayout";
 import AddressCard from "../../components/checkoutComponent/AddressCard";
 import { useNavigate } from "react-router-dom";
 import orderStore from "../../store/orderStore";
+import { toast } from "react-toastify";
+import Loader from "react-js-loader";
 interface CartItem {
   id: string;
   name: string;
@@ -19,8 +21,8 @@ interface CartItem {
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchCartItems, deleteCartItems, discount } = productStore();
-  const { createOrder } = orderStore();
+  const { fetchCartItems, deleteCartItems, discount, loading: productLoading } = productStore();
+  const { createOrder, loading: orderLoading } = orderStore();
   const [localCart, setLocalCart] = useState<CartItem[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -29,8 +31,6 @@ const CheckoutPage: React.FC = () => {
   useEffect(() => {
     const getItems = async () => {
       const res = (await fetchCartItems({} as any)) as any;
-      console.log("data fetch from backend..", res.data?.items);
-
       if (res.success && res.data?.items) {
         const formattedItems = res.data.items.map((item: any) => ({
           id: item._id,
@@ -69,15 +69,15 @@ const CheckoutPage: React.FC = () => {
   }, [localCart]);
 
   // use Address
-  const onUseAddress = (address : any) => {
+  const onUseAddress = (address: any) => {
     setSelectedAddress(address);
-    setSelectedAddressId(address._id)
+    setSelectedAddressId(address._id);
   };
 
   // Place order handler
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      alert("Please select an address before placing the order");
+      toast.error("Please select an address before placing the order");
       return;
     }
     const orderData = {
@@ -95,114 +95,141 @@ const CheckoutPage: React.FC = () => {
       discountAmount: subtotal + deliveryFee - discountedTotal,
       paymentMethod: "COD",
     };
-    
-    
+
     const result = await createOrder(orderData as any);
     if (result.success) {
-      alert("Order placed successfully!");
-      navigate("/ordersuccess");
+      toast.success("Order placed successfully!");
+      setTimeout(() => navigate("/ordersuccess"), 1000);
     } else {
-      alert(result.message || "Failed to place order!");
+      toast.error(result.message || "Failed to place order!");
     }
   };
 
   return (
     <>
       <MainLayout>
-        <div className="min-h-screen bg-gray-100">
-          {/* MAIN CONTENT */}
-          <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* LEFT SECTION - FORM */}
-              <div className="w-full lg:col-span-2 bg-white rounded-2xl shadow-md p-5 sm:p-8 space-y-8 transition-all duration-300">
-                {/* Tabs Header */}
-                <div className="w-full flex justify-between items-center">
-                  <div className="text-2xl font-bold">Your Address</div>
-                  <div><button className="w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 cursor-pointer bg-black text-white hover:bg-gray-700" onClick={()=> navigate('/createaddress')}>Add New Address</button></div>
-                </div>
-                {/* Tab Content */}
-                <div className="w-full bg-gray-50 rounded-xl shadow-inner px-5 sm:px-8 py-6 transition-all duration-500 flex flex-col items-center gap-3">
-                    <AddressCard setAddress={onUseAddress} selectedAddressId={selectedAddressId}/>
-                </div>
-              </div>
-
-              {/* RIGHT SECTION - ORDER SUMMARY */}
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
-                  <h2 className="text-xl font-semibold text-black mb-4">
-                    Order Summary
-                  </h2>
-
-                  {/* Cart Items */}
-                  <div className="space-y-4 mb-6">
-                    {localCart.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center space-x-4 pb-4 border-b border-gray-200"
+        {productLoading || orderLoading ? (
+          <div className="flex justify-center my-5 min-h-[400px]">
+            <Loader
+              type="spinner-default"
+              bgColor="#000000"
+              color="#1D4ED8"
+              size={90}
+            />
+          </div>
+        ) : (
+          <div className="min-h-screen bg-gray-100">
+            {/* MAIN CONTENT */}
+            <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* LEFT SECTION - FORM */}
+                <div className="w-full lg:col-span-2 bg-white rounded-2xl shadow-md p-5 sm:p-8 space-y-8 transition-all duration-300">
+                  {/* Tabs Header */}
+                  <div className="w-full flex justify-between items-center">
+                    <div className="text-2xl font-bold">Your Address</div>
+                    <div>
+                      <button
+                        className="w-full font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 cursor-pointer bg-black text-white hover:bg-gray-700"
+                        onClick={() => navigate("/createaddress")}
                       >
-                        <div className="w-15 h-18 overflow-hidden rounded-xl">
-                          <img src={item?.image} alt="" className="w-20 h-20" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-medium text-black">
-                            {item.name}
-                          </h3>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span className="text-sm text-gray-600">
-                              Quantity: {item.quantity}
-                            </span>
+                        Add New Address
+                      </button>
+                    </div>
+                  </div>
+                  {/* Tab Content */}
+                  <div className="w-full bg-gray-50 rounded-xl shadow-inner px-5 sm:px-8 py-6 transition-all duration-500 flex flex-col items-center gap-3">
+                    <AddressCard
+                      setAddress={onUseAddress}
+                      selectedAddressId={selectedAddressId}
+                    />
+                  </div>
+                </div>
+
+                {/* RIGHT SECTION - ORDER SUMMARY */}
+                <div className="lg:col-span-1">
+                  <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+                    <h2 className="text-xl font-semibold text-black mb-4">
+                      Order Summary
+                    </h2>
+
+                    {/* Cart Items */}
+                    <div className="space-y-4 mb-6">
+                      {localCart.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center space-x-4 pb-4 border-b border-gray-200"
+                        >
+                          <div className="w-15 h-18 overflow-hidden rounded-xl">
+                            <img
+                              src={item?.image}
+                              alt=""
+                              className="w-20 h-20"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-medium text-black">
+                              {item.name}
+                            </h3>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <span className="text-sm text-gray-600">
+                                Quantity: {item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-black">
+                              Rs {(item.price * item.quantity).toLocaleString()}
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-black">
-                            Rs {(item.price * item.quantity).toFixed(0)}
-                          </p>
+                      ))}
+                    </div>
+
+                    {/* Totals */}
+                    <div className="space-y-2 mb-6">
+                      <div className="flex justify-between text-gray-600">
+                        <span>Total Items</span>
+                        <span>{totalItems}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>Subtotal</span>
+                        <span>Rs {subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>Shipping</span>
+                        <span>Rs {deliveryFee.toFixed(0)}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>Discount</span>
+                        <span>{discount || 0}%</span>
+                      </div>
+
+                      <div className="pt-2 border-t border-gray-200">
+                        <div className="flex justify-between text-lg font-bold text-black">
+                          <span>Total</span>
+                          <span>Rs {discountedTotal.toLocaleString()}</span>
                         </div>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Complete Order Button */}
+                    <button
+                      className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors cursor-pointer"
+                      onClick={handlePlaceOrder}
+                    >
+                      Place Order
+                    </button>
+
+                    <p className="text-xs text-gray-500 text-center mt-4">
+                      By completing this order, you agree to our terms and
+                      conditions
+                    </p>
                   </div>
-
-                  {/* Totals */}
-                  <div className="space-y-2 mb-6">
-                    <div className="flex justify-between text-gray-600">
-                      <span>Total Items</span>
-                      <span>{totalItems}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>Subtotal</span>
-                      <span>Rs {subtotal.toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>Shipping</span>
-                      <span>Rs {deliveryFee.toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>Discount</span>
-                      <span>{discount || 0}%</span>
-                    </div>
-
-                    <div className="pt-2 border-t border-gray-200">
-                      <div className="flex justify-between text-lg font-bold text-black">
-                        <span>Total</span>
-                        <span>Rs {discountedTotal.toFixed(0)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Complete Order Button */}
-                  <button className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors cursor-pointer" onClick={handlePlaceOrder}>
-                    Place Order
-                  </button>
-
-                  <p className="text-xs text-gray-500 text-center mt-4">
-                    By completing this order, you agree to our terms and
-                    conditions
-                  </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </MainLayout>
     </>
   );

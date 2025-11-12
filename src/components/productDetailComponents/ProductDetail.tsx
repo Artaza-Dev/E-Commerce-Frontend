@@ -25,7 +25,7 @@ function ProductDetail() {
             Brand: <span className="font-semibold">{currentProduct.brand}</span>
           </p>
           <p className="text-3xl sm:text-4xl font-bold text-blue-600">
-            Rs {currentProduct.baseprice}
+            Rs {currentProduct.baseprice.toLocaleString()}
           </p>
         </div>
 

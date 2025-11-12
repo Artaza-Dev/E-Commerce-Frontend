@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import productStore from "../../store/productStore";
+import { toast } from "react-toastify";
+
 interface ItemCardProps {
   cardImage: string;
   cardTitle: string;
@@ -28,15 +30,14 @@ const ItemCards: React.FC<ItemCardProps> = ({
 
     if (!res.success) {
       setWish((prev) => !prev);
-      alert(res.message || "Failed to update wishlist");
+      toast.success(res.message || "Failed to update wishlist");
     } else {
       console.log("Wishlist updated:", res.message);
       if (onWishToggle) onWishToggle();
     }
   } catch (error) {
-    console.error("Wishlist error:", error);
     setWish((prev) => !prev);
-    alert("Something went wrong. Please try again.");
+    toast.error("Something went wrong. Please try again.");
   }
 };
 
@@ -77,7 +78,7 @@ const ItemCards: React.FC<ItemCardProps> = ({
       
       <div className="flex items-center space-x-2">
         <p className="text-2xl font-bold text-gray-900">
-          Rs {cardPrice}
+          Rs {cardPrice.toLocaleString()}
         </p>
       </div>
     </div>

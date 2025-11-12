@@ -15,12 +15,18 @@ interface ProductStore {
   summaryItems: any[];
   selectedCategory: string;
   discount: number | null;
+  hasNextPage: boolean;
+  nextPage: number;
   addItemsToSummary: (data: any[]) => void;
   setSelectedCategory: (cat: string) => void;
   fetchProductByCategory: (
     id: string
   ) => Promise<{ success: boolean; message?: string; data?: any }>;
-  fetchProducts: () => Promise<void>;
+  fetchProducts: (
+    page: number,
+    limit: number,
+    append: boolean
+  ) => Promise<void>;
   findProduct: (id: string) => Promise<void>;
   addToCart: (data: Cart) => Promise<{ success: boolean; message?: string }>;
   fetchCartItems: (
@@ -37,12 +43,17 @@ interface ProductStore {
     message?: string;
     data?: any;
   }>;
-   applyCouponCode: (
+  applyCouponCode: (
     code: string
+  ) => Promise<{ success: boolean; message?: string }>;
+  createReview: (
+    data: any
   ) => Promise<{ success: boolean; message?: string }>;
 }
 
 const productStore = create<ProductStore>((set) => ({
+  hasNextPage: true,
+  nextPage: 2,
   product: [],
   currentProduct: null,
   wishListProducts: [],
@@ -53,27 +64,33 @@ const productStore = create<ProductStore>((set) => ({
   categoryItems: [],
   summaryItems: [],
   selectedCategory: localStorage.getItem("selectedCategory") || "AllProducts",
-  discount:  null,
+  discount: null,
 
   addItemsToSummary: (data: any[]) => {
     set(() => {
       const summary = data;
-      console.log('summary data in store', summary);
-      
+      console.log("summary data in store", summary);
+
       return { summaryItems: summary };
     });
   },
 
   // Fetch all products from API
-  fetchProducts: async () => {
+  fetchProducts: async (page: number, limit: number, append: boolean) => {
     try {
       set({ loading: true, error: null });
-      const response = await api.get("/product/fetchproducts");
-      set({
-        product: response.data.products || [],
+      const response = await api.post("/product/fetchproducts", {
+        params: { page, limit },
+      });
+      const { docs, hasNextPage, nextPage } = response.data.products;
+
+      set((state) => ({
+        product: append ? [...state.product, ...docs] : docs,
         loading: false,
         error: null,
-      });
+        hasNextPage,
+        nextPage: hasNextPage ? nextPage : 1,
+      }));
     } catch (err: any) {
       set({ loading: false, error: err.message || "Failed to fetch products" });
     }
@@ -245,6 +262,27 @@ const productStore = create<ProductStore>((set) => ({
       };
     } catch (error: any) {
       const message = error.response?.data?.message || "delete cart failed";
+      set({ loading: false, error: message });
+      return { success: false, message };
+    }
+  },
+  createReview: async (data: any) => {
+    try {
+      set({ loading: true, error: null });
+      const response = await api.post("/product/review", data);
+
+      set({
+        loading: false,
+        error: null,
+        message: response.data.message,
+      });
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data,
+      };
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Create review failed";
       set({ loading: false, error: message });
       return { success: false, message };
     }

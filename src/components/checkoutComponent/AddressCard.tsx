@@ -19,10 +19,6 @@ const AddressCard: React.FC<AddressCardProps> = ({
     };
     fetchData();
   }, [fetchaddress]);
-  console.log("data in addresses card compo", addresses);
-
-  // Dummy button handler
-
   return (
     <>
       {addresses?.length > 0 ? (
@@ -50,11 +46,6 @@ const AddressCard: React.FC<AddressCardProps> = ({
                   </span>
                 ) : (
                   <> </>
-                  // val?.isDefault && (
-                  //   <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded">
-                  //     Default
-                  //   </span>
-                  // )
                 )}
               </div>
 

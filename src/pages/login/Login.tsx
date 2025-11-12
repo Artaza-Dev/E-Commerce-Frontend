@@ -11,6 +11,7 @@ import Loader from "react-js-loader";
 import Input from "../../components/ui/Input";
 import CredientialButton from "../../components/ui/CredientialButton";
 import userStore from "../../store/userStore";
+import { toast } from "react-toastify";
 
 // Define types for errors
 interface FormErrors {
@@ -59,26 +60,27 @@ const Login: React.FC = () => {
       await signupSchema.validate({ email, password }, { abortEarly: false });
       const data: UserData = { email, password };
       const result = await loginUser(data);
-      console.log("Registered:", data);
+
       if (result.success) {
         setEmail("");
         setPassword("");
         setErrors({});
         navigate("/");
       }else{
-        alert(result.message || "Login failed");
+        toast.error(result.message || "Login failed");
       }
     } catch (err: any) {
-      // collect yup validation errors
       const valErrors: FormErrors = {};
       if (err?.inner && Array.isArray(err.inner)) {
         err.inner.forEach((vi: any) => {
           if (vi.path) valErrors[vi.path as keyof FormErrors] = vi.message;
+          toast.error(vi.message)
         });
       } else if (err?.path) {
         valErrors[err.path as keyof FormErrors] = err.message;
+        toast.error(err.message)
       } else {
-        console.error(err);
+        toast.error(err)
       }
       setErrors(valErrors);
     } finally {

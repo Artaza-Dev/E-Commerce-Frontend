@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import productStore from "../../store/productStore";
 import { useNavigate } from "react-router-dom";
-
+import {toast, ToastContainer} from "react-toastify";
 function DetailsSection() {
   const navigate = useNavigate();
   const { currentProduct, addToCart } = productStore();
@@ -173,11 +173,11 @@ function DetailsSection() {
 
   const addToCartHandler = async () => {
     if (!currentProduct?._id || !selectedVariant?._id) {
-      alert("Please select a valid product variant.");
+      toast.error("Please select a valid product variant.");
       return;
     }
     if (selectedVariant.quantity === 0) {
-      alert("This variant is out of stock.");
+      toast.error("This variant is out of stock.");
       return;
     }
 
@@ -187,17 +187,17 @@ function DetailsSection() {
       quantity,
       variantMaxQuantity: selectedVariant.quantity,
     };
-
+    
     try {
       const result = await addToCart(data as any);
       if (result.success) {
-        alert(result.message || "Product added to cart successfully");
+        toast.success(result.message || "Product added to cart successfully");
         navigate(`/productDetails/${data.productId}`);
       } else {
-        alert(result.message || "Something went wrong while adding to cart");
+        toast.error(result.message || "Something went wrong while adding to cart");
       }
     } catch (error) {
-      alert("Failed to add product to cart");
+      toast.error("Failed to add product to cart");
     }
   };
 
@@ -237,7 +237,8 @@ function DetailsSection() {
   }
 
   return (
-    <div className="w-full bg-gray-100 py-6 sm:py-10 lg:py-14 2xl:py-20">
+    <>
+      <div className="w-full bg-gray-100 py-6 sm:py-10 lg:py-14 2xl:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-6 bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-8">
           {/* LEFT SECTION - PRODUCT IMAGES */}
@@ -287,7 +288,7 @@ function DetailsSection() {
 
             {/* Price */}
             <div className="text-3xl font-semibold text-gray-800">
-              Rs {selectedVariant?.price || "N/A"}
+              Rs {selectedVariant?.price.toLocaleString() || "N/A"}
             </div>
 
             {/* Description */}
@@ -401,6 +402,9 @@ function DetailsSection() {
         </div>
       </div>
     </div>
+    <ToastContainer/>
+    </>
+    
   );
 }
 

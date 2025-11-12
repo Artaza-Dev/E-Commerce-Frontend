@@ -14,6 +14,7 @@ interface UserStore {
   loginUser: (
     data: User
   ) => Promise<{ success: boolean; data?: any; message?: string }>;
+  logoutUser: () => Promise<{ success: boolean;message?: string }>;
 }
 
 const userStore = create<UserStore>((set) => ({
@@ -23,7 +24,6 @@ const userStore = create<UserStore>((set) => ({
   user: null,
   token: null,
 
-  // ✅ Fetch all products from API
   registerUser: async (data: User) => {
     try {
       set({ loading: true, error: null });
@@ -78,12 +78,22 @@ const userStore = create<UserStore>((set) => ({
     }
   },
 
-  logoutUser: () => {
+  logoutUser: async () => {
+  try {
+   
+    await api.post("/user/logout"); 
     localStorage.removeItem("token");
     localStorage.removeItem("tokenExpiry");
     set({ user: null, token: null });
-    window.location.href = "/login";
-  },
+    window.location.href = "/";
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Logout failed:", error);
+    set({ loading: false });
+    return { success: false, message: error?.message || "Logout failed" };
+  }
+},
 }));
 
 export default userStore;
