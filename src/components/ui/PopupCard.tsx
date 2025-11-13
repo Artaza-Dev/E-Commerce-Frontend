@@ -20,8 +20,10 @@ const PopupCard: React.FC<IProps> = ({ onClose, id }) => {
     let result = await createReview(data)
     if(!result.success){
       toast.error("Error in creating review")
+      setTimeout(() => onClose() , 500);
     }else{
       toast.success("Thank you for submission")
+      setTimeout(() => onClose() , 500);
     }
   }
 

@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import productStore from "../../store/productStore";
 import { useNavigate } from "react-router-dom";
 import {toast, ToastContainer} from "react-toastify";
+import { FaStar } from "react-icons/fa";
 function DetailsSection() {
   const navigate = useNavigate();
   const { currentProduct, addToCart } = productStore();
@@ -12,7 +13,9 @@ function DetailsSection() {
 
   // Memoize images array
   const images = useMemo(() => {
+    console.log(currentProduct);
     return currentProduct?.images?.filter(Boolean) || [];
+    
   }, [currentProduct]);
 
   // Memoize available options
@@ -191,8 +194,13 @@ function DetailsSection() {
     try {
       const result = await addToCart(data as any);
       if (result.success) {
-        toast.success(result.message || "Product added to cart successfully");
-        navigate(`/productDetails/${data.productId}`);
+        // toast.success(result.message || "Product added to cart successfully");
+        productStore.setState((state) => ({
+        cartItems: [...state.cartItems, {}],
+      }));
+
+      navigate(`/productDetails/${data.productId}`);
+
       } else {
         toast.error(result.message || "Something went wrong while adding to cart");
       }
@@ -282,8 +290,11 @@ function DetailsSection() {
 
             {/* Rating */}
             <div className="flex items-center space-x-2">
-              <p className="text-yellow-500 text-lg">★★★★★</p>
-              <span className="text-gray-600 text-sm">4.5/5</span>
+                {[...Array(5)].map((_, i)=>(
+                  <FaStar key={i} className={`text-lg ${ i < (currentProduct?.ratings ?? 0) ? "text-yellow-400" : "text-gray-300"}`}/>
+                ))}
+              
+              {/* <span className="text-gray-600 text-sm">4.5/5</span> */}
             </div>
 
             {/* Price */}

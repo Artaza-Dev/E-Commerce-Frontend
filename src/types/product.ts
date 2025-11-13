@@ -23,17 +23,20 @@ interface Product {
   images: string[];
   specs: Specs;
   variants: Variant[];
-  rating?: number;
-  reviews?: Review[];
-  createdAt?: string;
-  updatedAt?: string;
+  numOfReviews?: number;
+  ratings: number;
+  reviews: Review[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Review {
   _id: string;
   productId: string;
   userId: string;
+  name: string;
   rating: number;
+  date: Date;
   comment: string;
   approved: boolean;
 }

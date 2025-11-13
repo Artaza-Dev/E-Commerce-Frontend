@@ -15,6 +15,7 @@ function ResultSection() {
     productStore();
   useEffect(() => {
     const init = async () => {
+      window.scrollTo(0, 0);
       const cat =
         selectedCategory ||
         localStorage.getItem("selectedCategory") ||

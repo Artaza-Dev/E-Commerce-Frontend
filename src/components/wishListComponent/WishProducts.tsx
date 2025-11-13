@@ -22,6 +22,7 @@ function WishProducts() {
   useEffect(() => {
     const loadWishlist = async () => {
       try {
+        window.scrollTo(0, 0);
         const response = await fetchWishListItems();
 
         if (response?.success && response?.data?.wishlistItems) {

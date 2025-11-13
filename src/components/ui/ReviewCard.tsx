@@ -30,7 +30,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       {/* User Info */}
       <div className="flex items-center gap-2 mb-2">
         <h3 className="font-semibold text-gray-900">{name}</h3>
-        {/* <FaCheckCircle className="text-green-500 text-sm" /> */}
       </div>
 
       {/* Comment */}

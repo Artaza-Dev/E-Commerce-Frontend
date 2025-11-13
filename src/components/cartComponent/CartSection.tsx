@@ -29,6 +29,7 @@ const CartSection: React.FC = () => {
   // Fetch cart items from backend
   useEffect(() => {
     const getItems = async () => {
+      window.scrollTo(0, 0);
       const res = (await fetchCartItems({} as any)) as any;
       console.log("data fetch from backend..", res.data?.items);
 
@@ -52,6 +53,10 @@ const CartSection: React.FC = () => {
     getItems();
   }, [fetchCartItems, deleteCartItems]);
 
+  useEffect(() => {
+    productStore.setState({ cartItems: localCart });
+  }, [localCart]);
+
   // (limit the quantity or increase)
   const increaseQuantity = async (
     id: string,
@@ -66,14 +71,15 @@ const CartSection: React.FC = () => {
           if (item.quantity < item.variantQuantity) {
             return { ...item, quantity: item.quantity + 1 };
           } else {
-            toast.error(`Only ${item.variantQuantity} items available in stock`);
+            toast.error(
+              `Only ${item.variantQuantity} items available in stock`
+            );
             return item;
           }
         }
         return item;
       })
     );
-    console.log("items increased", localCart);
 
     try {
       const newQuantity = quantity + 1;
@@ -124,11 +130,27 @@ const CartSection: React.FC = () => {
   const removeItem = async (id: string) => {
     const res = await deleteCartItems(id);
     if (res.success) {
-      setLocalCart((prev) => prev.filter((item) => item.id !== id));
+      // Remove from localCart
+      setLocalCart((prev) =>
+        prev.filter((item) => item.id !== id && item.id !== id)
+      );
+
+      productStore.setState((state) => {
+        const updatedItems = state.cartItems.filter(
+          (item: any) => item.id !== id && item.id !== id
+        );
+        return {
+          cartItems: updatedItems,
+          cartLength: updatedItems.length,
+        };
+      });
+
+      toast.success(res.message || "Item removed");
     } else {
       toast.error(res.message || "Failed to delete cart item");
     }
   };
+
   // Conform products to view summery
   const conformProductsHandler = (localCart: CartItem[]) => {
     addItemsToSummary(localCart);

@@ -15,6 +15,7 @@ interface UserStore {
     data: User
   ) => Promise<{ success: boolean; data?: any; message?: string }>;
   logoutUser: () => Promise<{ success: boolean;message?: string }>;
+  fetchCurrentUser: () => Promise<void>;
 }
 
 const userStore = create<UserStore>((set) => ({
@@ -94,6 +95,19 @@ const userStore = create<UserStore>((set) => ({
     return { success: false, message: error?.message || "Logout failed" };
   }
 },
+
+fetchCurrentUser: async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const response = await api.get("/user/mydata");
+      set({ user: response.data.user, token });
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+      set({ user: null, token: null });
+    }
+  },
+
 }));
 
 export default userStore;

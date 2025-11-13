@@ -6,6 +6,7 @@ function NewModelSection() {
   const { product, fetchProducts, hasNextPage, nextPage, loading } =
     productStore();
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchProducts(1, 4, false);
   }, []);
   console.log(product);

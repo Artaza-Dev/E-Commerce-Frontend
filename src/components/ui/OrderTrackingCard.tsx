@@ -4,7 +4,7 @@ import { PackageCheck, Truck, CheckCircle, Clock } from "lucide-react";
 import Loader from "react-js-loader";
 
 interface IProps {
-  onOpen: (e: React.MouseEvent, prodId: string) => void;
+  onOpen: ( prodId: string) => void;
 }
 
 const OrderTrackingCard: React.FC<IProps> = ({ onOpen }) => {
@@ -12,6 +12,7 @@ const OrderTrackingCard: React.FC<IProps> = ({ onOpen }) => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      window.scrollTo(0, 0);
       await fetchOrder();
     };
     fetchOrders();
@@ -103,7 +104,7 @@ const OrderTrackingCard: React.FC<IProps> = ({ onOpen }) => {
 
                           {order?.status === "Delivered" && (
                             <button
-                              onClick={(e) => onOpen(e, item.productId)} // ✅ Correct handler
+                              onClick={() => onOpen(item.productId)}
                               className="w-full bg-black text-white font-semibold py-1 rounded-lg hover:bg-gray-900 transition-all duration-300 cursor-pointer"
                             >
                               Review
