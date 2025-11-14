@@ -12,6 +12,7 @@ import PrivateRoute from "./PrivateRoute"
 import Checkout from "../pages/checkout/Checkout"
 import OrderSuccess from "../pages/orderSuccess/OrderSuccess"
 import AddAddress from "../components/checkoutComponent/AddAddress"
+import Coupon from "../pages/coupon/Coupon"
 function Routing() {
   return (
     <BrowserRouter>
@@ -29,6 +30,8 @@ function Routing() {
             <Route path="/checkout" element={<PrivateRoute><Checkout/></PrivateRoute>}/>
             <Route path="/createaddress" element={<PrivateRoute><AddAddress/></PrivateRoute>}/>
             <Route path="/ordersuccess" element={<PrivateRoute><OrderSuccess/></PrivateRoute>}/>
+            <Route path="/coupon" element={<PrivateRoute><Coupon/></PrivateRoute>}/>
+
         </Routes>
     </BrowserRouter>
   )

@@ -21,8 +21,8 @@ interface CartItem {
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchCartItems, deleteCartItems, discount, loading: productLoading } = productStore();
-  const { createOrder, loading: orderLoading } = orderStore();
+  const { fetchCartItems, deleteCartItems, discount, productLoading } = productStore();
+  const { createOrder } = orderStore();
   const [localCart, setLocalCart] = useState<CartItem[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -30,7 +30,7 @@ const CheckoutPage: React.FC = () => {
   // Fetch cart items from backend
   useEffect(() => {
     const getItems = async () => {
-      const res = (await fetchCartItems({} as any)) as any;
+      const res = (await fetchCartItems()) as any;
       if (res.success && res.data?.items) {
         const formattedItems = res.data.items.map((item: any) => ({
           id: item._id,
@@ -99,6 +99,7 @@ const CheckoutPage: React.FC = () => {
     const result = await createOrder(orderData as any);
     if (result.success) {
       toast.success("Order placed successfully!");
+      productStore.setState({ cartItems: [] })
       setTimeout(() => navigate("/ordersuccess"), 1000);
     } else {
       toast.error(result.message || "Failed to place order!");
@@ -108,7 +109,7 @@ const CheckoutPage: React.FC = () => {
   return (
     <>
       <MainLayout>
-        {productLoading || orderLoading ? (
+        {productLoading ? (
           <div className="flex justify-center my-5 min-h-[400px]">
             <Loader
               type="spinner-default"

@@ -6,7 +6,7 @@ import PopupCard from "../../components/ui/PopupCard";
 function Orders() {
   const [popup, setPopup] = useState(false);
   const [productId, setProductId] = useState<string>("")
-  const popupHandler = ( prodId: string) => {
+  const popupHandler = ( prodId: string, event: React.MouseEvent) => {
     setProductId(prodId)
     setPopup(true);
   };
@@ -17,7 +17,7 @@ function Orders() {
         {popup && (
           <PopupCard
             onClose={() => setPopup(false)}
-            id = {productId}
+            productId = {productId}
           />
         )}
         <OrderTrackingCard onOpen={popupHandler}/>

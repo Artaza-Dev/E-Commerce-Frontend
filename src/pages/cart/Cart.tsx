@@ -1,7 +1,6 @@
 import CartSection from "../../components/cartComponent/CartSection";
 import OrderSummery from "../../components/cartComponent/OrderSummery";
 import MainLayout from "../../components/layout/MainLayout";
-
 function Cart() {
   return (
     <>

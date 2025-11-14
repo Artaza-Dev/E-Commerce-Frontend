@@ -4,41 +4,40 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+
 const OrderSummary: React.FC = () => {
-  const { summaryItems, applyCouponCode, discount } = productStore();
+  const {
+    applyCouponCode,
+    discount,
+    cartThings
+  } = productStore();
   const navigate = useNavigate();
   const [code, setCode] = useState<String>("");
-  // Calculate summary values dynamically
+
   const { subtotal, deliveryFee, totalItems, discountedTotal } = useMemo(() => {
-    const subtotal = summaryItems.reduce(
+    const subtotal = cartThings.reduce(
       (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
       0
     );
 
-    const deliveryFee = subtotal > 0 ? summaryItems.length * 200 : 0;
-    const totalItems = summaryItems.reduce(
-      (acc, item) => acc + item.quantity,
-      0
-    );
+    const deliveryFee = cartThings.length > 0 ? cartThings.length * 200 : 0;
+    const totalItems = cartThings.reduce((acc, item) => acc + item.quantity, 0);
 
     const total = subtotal + deliveryFee;
     const discountAmount = (total * (discount || 0)) / 100;
     const discountedTotal = total - discountAmount;
 
-    return { subtotal, deliveryFee, totalItems, total, discountedTotal };
-  }, [summaryItems]);
+    return { subtotal, deliveryFee, totalItems, discountedTotal };
+  }, [cartThings, discount]);
 
   const orderHander = (totalItems: number) => {
     if (totalItems > 0) {
       navigate("/checkout");
-      setTimeout(() => {
-        window.location.reload();
-      }, 200);
     } else {
       toast.error("No items found");
     }
   };
-
+  // Coupon code apply handler
   const submitHandler = async (e: any) => {
     e.preventDefault();
     const result = await applyCouponCode(code as string);
@@ -64,7 +63,9 @@ const OrderSummary: React.FC = () => {
 
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span className="font-semibold">Rs {subtotal.toLocaleString() || 0}</span>
+          <span className="font-semibold">
+            Rs {subtotal.toLocaleString() || 0}
+          </span>
         </div>
 
         <div className="flex justify-between">
@@ -73,7 +74,7 @@ const OrderSummary: React.FC = () => {
             Rs {deliveryFee.toFixed(0) || 0}
           </span>
         </div>
-        
+
         <div className="flex justify-between">
           <span>Discount</span>
           <span className="font-semibold">Rs {discount || 0}%</span>
@@ -110,7 +111,7 @@ const OrderSummary: React.FC = () => {
         className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer"
         onClick={() => orderHander(totalItems)}
       >
-        ({totalItems}) Go to Checkout
+        ({cartThings?.length}) Go to Checkout
         <ArrowRight />
       </button>
     </div>

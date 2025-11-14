@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Trash, Plus, Minus, ArrowRight } from "lucide-react";
+import { Trash, Plus, Minus } from "lucide-react";
 import productStore from "../../store/productStore";
 import Loader from "react-js-loader";
 import { toast } from "react-toastify";
@@ -17,20 +17,15 @@ interface CartItem {
 }
 
 const CartSection: React.FC = () => {
-  const {
-    fetchCartItems,
-    loading,
-    deleteCartItems,
-    addToCart,
-    addItemsToSummary,
-  } = productStore();
+  const { fetchCartItems, loading, deleteCartItems, addToCart } =
+    productStore();
   const [localCart, setLocalCart] = useState<CartItem[]>([]);
-  const [isActive, setIsActive] = useState<boolean>(true);
+
   // Fetch cart items from backend
   useEffect(() => {
     const getItems = async () => {
       window.scrollTo(0, 0);
-      const res = (await fetchCartItems({} as any)) as any;
+      const res = (await fetchCartItems()) as any;
       console.log("data fetch from backend..", res.data?.items);
 
       if (res.success && res.data?.items) {
@@ -48,6 +43,7 @@ const CartSection: React.FC = () => {
           variantId: item.variant?._id,
         }));
         setLocalCart(formattedItems);
+        productStore.setState({ cartThings: formattedItems });
       }
     };
     getItems();
@@ -65,8 +61,8 @@ const CartSection: React.FC = () => {
     variantQuantity: number,
     quantity: number
   ) => {
-    setLocalCart((prev) =>
-      prev.map((item) => {
+    setLocalCart((prev) => {
+      const updatedCart = prev.map((item) => {
         if (item.id === id) {
           if (item.quantity < item.variantQuantity) {
             return { ...item, quantity: item.quantity + 1 };
@@ -78,8 +74,11 @@ const CartSection: React.FC = () => {
           }
         }
         return item;
-      })
-    );
+      });
+      productStore.setState({ cartThings: updatedCart });
+
+      return updatedCart;
+    });
 
     try {
       const newQuantity = quantity + 1;
@@ -104,15 +103,18 @@ const CartSection: React.FC = () => {
     variantId: string,
     variantQuantity: number
   ) => {
-    setLocalCart((prev) =>
-      prev
+    setLocalCart((prev) => {
+      const updatedCart = prev
         .map((item) =>
           item.id === id && item.quantity > 1
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
-        .filter((item) => item.quantity > 0)
-    );
+        .filter((item) => item.quantity > 0);
+      productStore.setState({ cartThings: updatedCart });
+
+      return updatedCart;
+    });
     try {
       const res = await addToCart({
         productId,
@@ -130,19 +132,13 @@ const CartSection: React.FC = () => {
   const removeItem = async (id: string) => {
     const res = await deleteCartItems(id);
     if (res.success) {
-      // Remove from localCart
-      setLocalCart((prev) =>
-        prev.filter((item) => item.id !== id && item.id !== id)
-      );
-
-      productStore.setState((state) => {
-        const updatedItems = state.cartItems.filter(
-          (item: any) => item.id !== id && item.id !== id
+      setLocalCart((prev) => {
+        const updatedCart = prev.filter(
+          (item) => item.id !== id && item.id !== id
         );
-        return {
-          cartItems: updatedItems,
-          cartLength: updatedItems.length,
-        };
+        productStore.setState({ cartThings: updatedCart });
+
+        return updatedCart;
       });
 
       toast.success(res.message || "Item removed");
@@ -151,13 +147,37 @@ const CartSection: React.FC = () => {
     }
   };
 
+  // const removeItem = async (id: string) => {
+  //   const res = await deleteCartItems(id);
+  //   if (res.success) {
+  //     setLocalCart((prev) =>
+  //       prev.filter((item) => item.id !== id && item.id !== id)
+  //     );
+
+  //     productStore.setState((state) => {
+  //       const updatedItems = state.cartItems.filter(
+  //         (item: any) => item.id !== id && item.id !== id
+  //       );
+  //       return {
+  //         cartItems: updatedItems,
+  //         cartLength: updatedItems.length,
+  //       };
+  //     });
+
+  //     toast.success(res.message || "Item removed");
+  //   } else {
+  //     toast.error(res.message || "Failed to delete cart item");
+  //   }
+  // };
+
   // Conform products to view summery
-  const conformProductsHandler = (localCart: CartItem[]) => {
-    addItemsToSummary(localCart);
-    setIsActive(false);
-  };
+
+  // const conformProductsHandler = (localCart: CartItem[]) => {
+  //   addItemsToSummary(localCart);
+  //   setIsActive(false);
+  // };
   return (
-    <div className="w-full bg-white p-5 sm:p-6 rounded-2xl shadow-lg">
+    <div className="w-full min-h-[460px] bg-white p-5 sm:p-6 rounded-2xl shadow-lg">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
         Your Cart
       </h2>
@@ -217,7 +237,6 @@ const CartSection: React.FC = () => {
                     <div className="flex items-center bg-gray-200 rounded-full overflow-hidden">
                       <button
                         onClick={() =>
-                          isActive &&
                           decreaseQuantity(
                             item.id,
                             item.productId,
@@ -225,21 +244,15 @@ const CartSection: React.FC = () => {
                             item.variantQuantity
                           )
                         }
-                        disabled={!isActive}
-                        className={`p-2 transition-all ${
-                          isActive
-                            ? "text-gray-700 hover:bg-gray-300 cursor-pointer"
-                            : "text-gray-400 cursor-not-allowed opacity-50"
-                        }`}
+                        className="p-2 transition-all text-gray-700 hover:bg-gray-300 cursor-pointer"
+
                       >
                         <Minus size={14} />
                       </button>
 
                       {/* Quantity Display */}
                       <span
-                        className={`px-4 font-medium ${
-                          isActive ? "text-gray-800" : "text-gray-400"
-                        }`}
+                        className="px-4 font-medium text-gray-800"
                       >
                         {item.quantity}
                       </span>
@@ -247,7 +260,6 @@ const CartSection: React.FC = () => {
                       {/* Increase Button */}
                       <button
                         onClick={() =>
-                          isActive &&
                           increaseQuantity(
                             item.id,
                             item.productId,
@@ -256,25 +268,16 @@ const CartSection: React.FC = () => {
                             item.quantity
                           )
                         }
-                        disabled={!isActive}
-                        className={`p-2 transition-all ${
-                          isActive
-                            ? "text-gray-700 hover:bg-gray-300 cursor-pointer"
-                            : "text-gray-400 cursor-not-allowed opacity-50"
-                        }`}
+                        className="p-2 transition-all text-gray-700 hover:bg-gray-300 cursor-pointer"
                       >
                         <Plus size={14} />
                       </button>
                     </div>
 
                     <button
-                      onClick={() => isActive && removeItem(item.id)}
-                      disabled={!isActive}
-                      className={`transition-all ${
-                        isActive
-                          ? "text-red-500 hover:text-red-700 cursor-pointer"
-                          : "text-gray-400 cursor-not-allowed opacity-50"
-                      }`}
+                      onClick={() => removeItem(item.id)}
+                      className="transition-all
+                      text-red-500 hover:text-red-700 cursor-pointer"
                     >
                       <Trash size={20} />
                     </button>
@@ -287,13 +290,14 @@ const CartSection: React.FC = () => {
               </p>
             )}
           </div>
-          <button
+
+          {/* <button
             className="w-full bg-black text-white py-3 mt-5 rounded-lg font-semibold text-lg hover:bg-gray-800 transition flex justify-center items-center gap-2 cursor-pointer"
             onClick={() => conformProductsHandler(localCart)}
           >
             Conform products
             <ArrowRight />
-          </button>
+          </button> */}
         </>
       )}
     </div>

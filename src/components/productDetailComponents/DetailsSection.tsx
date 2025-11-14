@@ -194,10 +194,12 @@ function DetailsSection() {
     try {
       const result = await addToCart(data as any);
       if (result.success) {
-        // toast.success(result.message || "Product added to cart successfully");
-        productStore.setState((state) => ({
-        cartItems: [...state.cartItems, {}],
-      }));
+        toast.success(result.message || "Product added to cart successfully");
+        
+    //     productStore.setState((state) => ({
+    //     cartItems: [...state.cartItems, {}],
+    //   })
+    // );
 
       navigate(`/productDetails/${data.productId}`);
 

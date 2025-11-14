@@ -3,17 +3,17 @@ import productStore from "../../store/productStore";
 import { toast } from "react-toastify";
 interface IProps {
   onClose: () => void;
-  id: string;
+  productId: string;
 }
 
-const PopupCard: React.FC<IProps> = ({ onClose, id }) => {
+const PopupCard: React.FC<IProps> = ({ onClose, productId }) => {
   const { createReview } = productStore()
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
 
   const reviewHandler = async ()=>{
     const data ={
-      productId: id,
+      productId: productId,
       rating,
       comment,
     }
@@ -34,7 +34,8 @@ const PopupCard: React.FC<IProps> = ({ onClose, id }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[90%] sm:w-[420px] bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 animate-fadeIn transition-all duration-300"
+        className="absolute top-44 w-[90%] sm:w-[420px] bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 animate-fadeIn transition-all duration-300"
+        
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">

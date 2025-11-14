@@ -97,14 +97,15 @@ const userStore = create<UserStore>((set) => ({
 },
 
 fetchCurrentUser: async () => {
+   set({ loading: true, error: null });
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
       const response = await api.get("/user/mydata");
-      set({ user: response.data.user, token });
+      set({ loading:false, error: null, user: response.data.user, token });
     } catch (error) {
       console.error("Failed to fetch user:", error);
-      set({ user: null, token: null });
+      set({loading: false, user: null, token: null });
     }
   },
 

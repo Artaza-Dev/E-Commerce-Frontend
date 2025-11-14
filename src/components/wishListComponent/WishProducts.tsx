@@ -15,7 +15,7 @@ interface WishItem {
 }
 
 function WishProducts() {
-  const { fetchWishListItems, loading } = productStore();
+  const { fetchWishListItems, wishlistLoading } = productStore();
   const [items, setItems] = useState<WishItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +53,7 @@ function WishProducts() {
         <p className="text-2xl font-bold">WishList Products</p>
       </div>
 
-      {loading ? (
+      {wishlistLoading ? (
         <div className="flex justify-center my-5 min-h-[300px]">
           <Loader
             type="spinner-default"

@@ -9,6 +9,8 @@ interface ProductStore {
   wishListProducts: Product[];
   message: string | null;
   loading: boolean;
+  productLoading: boolean;
+  wishlistLoading: boolean;
   error: string | null;
   cartItems: any[];
   categoryItems: any[];
@@ -18,6 +20,7 @@ interface ProductStore {
   hasNextPage: boolean;
   nextPage: number;
   cartLength: number;
+  cartThings: any[];
   addItemsToSummary: (data: any[]) => void;
   setSelectedCategory: (cat: string) => void;
   fetchProductByCategory: (
@@ -31,7 +34,6 @@ interface ProductStore {
   findProduct: (id: string) => Promise<void>;
   addToCart: (data: Cart) => Promise<{ success: boolean; message?: string }>;
   fetchCartItems: (
-    data: Cart
   ) => Promise<{ success: boolean; message?: string }>;
   deleteCartItems: (
     id: string
@@ -59,14 +61,19 @@ const productStore = create<ProductStore>((set) => ({
   currentProduct: null,
   wishListProducts: [],
   loading: false,
+  productLoading: false,
+  wishlistLoading: false,
   error: null,
   message: null,
   cartItems: [],
   cartLength: 0,
   categoryItems: [],
   summaryItems: [],
+  cartThings:[],
   selectedCategory: localStorage.getItem("selectedCategory") || "AllProducts",
   discount: null,
+
+  setCartThings: (items: any) => set({ cartThings: items }),
 
   addItemsToSummary: (data: any[]) => {
     set(() => {
@@ -81,7 +88,7 @@ const productStore = create<ProductStore>((set) => ({
   fetchProducts: async (page: number, limit: number, append: boolean) => {
     try {
       set({ loading: true, error: null });
-      const response = await api.post("/product/fetchproducts", {
+      const response = await api.get("/product/fetchproducts", {
         params: { page, limit },
       });
       const { docs, hasNextPage, nextPage } = response.data.products;
@@ -119,12 +126,12 @@ const productStore = create<ProductStore>((set) => ({
       const response = await api.post("/product/addtocart", data);
       console.log("add to cart response in stroe", response.data);
       const newCartItems = response.data.cart?.items || [];
-      set({ loading: false, error: null, message: response.data.message, cartLength: newCartItems.length, cartItems: newCartItems, });
+      set({ loading: false, error: null, message: response.data.message, cartItems: newCartItems, });
       return {
         success: true,
         data: response.data,
         message: response.data.message,
-        cartLength: newCartItems.length
+        // cartLength: newCartItems.length
       };
     } catch (error: any) {
       const message = error.response?.data?.message || "add cart failed";
@@ -135,16 +142,16 @@ const productStore = create<ProductStore>((set) => ({
 
   fetchCartItems: async () => {
     try {
-      set({ loading: true, error: null });
+      set({ productLoading: true, error: null });
       const response = await api.get("/product/cartitems");
       console.log("items in store", response.data.items);
       const items = response.data.items || [];
 
       set({
-        loading: false,
+        productLoading: false,
         error: null,
         cartItems: items,
-        cartLength: items.length,
+        // cartLength: items.length,
         message: response.data.message,
       });
       return {
@@ -154,7 +161,7 @@ const productStore = create<ProductStore>((set) => ({
       };
     } catch (error: any) {
       const message = error.response?.data?.message || "add cart failed";
-      set({ loading: false, error: message });
+      set({ productLoading: false, error: message });
       return { success: false, message };
     }
   },
@@ -170,7 +177,7 @@ const productStore = create<ProductStore>((set) => ({
       loading: false,
       error: null,
       cartItems: updatedCartItems,
-      cartLength: updatedCartItems.length,
+      // cartLength: updatedCartItems.length,
       message: response.data.message,
     });
 
@@ -220,14 +227,14 @@ const productStore = create<ProductStore>((set) => ({
 
   addProductToWishList: async (id: string) => {
     try {
-      set({ loading: true, error: null });
+      set({ wishlistLoading: true, error: null });
       const response = await api.get(`/product/addtowishlist/${id}`);
       const wishlistResponse = await api.get("/product/getwishlist");
       const wishlistItems = wishlistResponse.data.wishlistItems.map(
       (item: any) => item.product
     );
       set({
-      loading: false,
+      wishlistLoading: false,
       error: null,
       wishListProducts: wishlistItems 
     });
@@ -238,20 +245,20 @@ const productStore = create<ProductStore>((set) => ({
       };
     } catch (error: any) {
       const message = error.response?.data?.message || "delete cart failed";
-      set({ loading: false, error: message });
+      set({ wishlistLoading: false, error: message });
       return { success: false, message };
     }
   },
 
   fetchWishListItems: async () => {
     try {
-      set({ loading: true, error: null });
+      set({ wishlistLoading: true, error: null });
       const response = await api.get("/product/getwishlist");
       const wishlistItems = response.data.wishlistItems.map(
       (item: any) => item.product
     );
       set({
-        loading: false,
+        wishlistLoading: false,
         error: null,
         message: response.data.message,
         wishListProducts: wishlistItems,
@@ -263,7 +270,7 @@ const productStore = create<ProductStore>((set) => ({
       };
     } catch (error: any) {
       const message = error.response?.data?.message || "delete cart failed";
-      set({ loading: false, error: message });
+      set({ wishlistLoading: false, error: message });
       return { success: false, message };
     }
   },

@@ -10,13 +10,13 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, logoutUser, fetchCurrentUser } = userStore();
-  const { wishListProducts, cartLength } = productStore();
+  const { wishListProducts, cartItems } = productStore();
   useEffect(() => {
     const initializeUser = async () => {
       await fetchCurrentUser();
     };
     initializeUser();
-  }, [ ]);
+  }, []);
 
   const logoutHandler = async () => {
     try {
@@ -63,6 +63,12 @@ function Navbar() {
               >
                 Orders
               </NavLink>
+              <NavLink
+                to="/coupon"
+                className="text-black hover:text-zinc-400 transition"
+              >
+                Coupons
+              </NavLink>
             </div>
           </div>
 
@@ -91,9 +97,9 @@ function Navbar() {
                   className="relative group p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-300 cursor-pointer"
                 >
                   <ShoppingCart className="w-6 h-6 text-zinc-700 dark:text-zinc-300 group-hover:text-blue-500 group-hover:scale-110 transition-all duration-300" />
-                  {cartLength > 0 && (
+                  {cartItems.length > 0 && (
                     <span className="absolute -top-1 -right-1 bg-linear-to-br from-blue-500 to-indigo-600 text-white text-[10px] font-semibold min-w-5 h-5 px-1 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/50">
-                      {cartLength > 99 ? "99+" : cartLength}
+                      {cartItems.length > 99 ? "99+" : cartItems.length}
                     </span>
                   )}
                 </NavLink>
@@ -152,7 +158,6 @@ function Navbar() {
           className={`md:hidden bg-white shadow-inner flex flex-col space-y-4 px-6 text-sm font-medium overflow-hidden transition-all duration-500 ease-in-out ${
             menuOpen ? "max-h-72 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
           }`}
-          onClick={() => navigate("/login")}
         >
           <NavLink
             to="/"
@@ -176,19 +181,13 @@ function Navbar() {
             Orders
           </NavLink>
           <NavLink
-            to="/wishlist"
+            to="/coupon"
             onClick={() => setMenuOpen(false)}
             className="text-black hover:text-zinc-400 transition"
           >
-            Wishlist
+            Coupons
           </NavLink>
-          <NavLink
-            to="/cart"
-            onClick={() => setMenuOpen(false)}
-            className="text-black hover:text-zinc-400 transition"
-          >
-            Cart
-          </NavLink>
+          
           {!user?.email && (
             <>
               <button className="md:hidden group relative w-44 px-5 md:px-8 py-2 bg-black text-white text-lg font-bold rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">

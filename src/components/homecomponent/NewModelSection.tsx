@@ -53,7 +53,7 @@ function NewModelSection() {
             <button
               onClick={handleLoadMore}
               disabled={loading}
-              className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+              className="bg-black text-white px-6 py-3 rounded-2xl hover:bg-gray-800 transition cursor-pointer"
             >
               {loading ? "Loading..." : "Load More"}
             </button>
