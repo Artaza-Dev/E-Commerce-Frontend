@@ -7,35 +7,38 @@ interface IProps {
 }
 
 const PopupCard: React.FC<IProps> = ({ onClose, productId }) => {
-  const { createReview } = productStore()
+  const { createReview } = productStore();
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
 
-  const reviewHandler = async ()=>{
-    const data ={
+  const reviewHandler = async () => {
+    const data = {
       productId: productId,
       rating,
       comment,
+    };
+    let result = await createReview(data);
+    if (!result.success) {
+      toast.error("Error in creating review");
+      setTimeout(() => onClose(), 500);
+    } else {
+      toast.success("Thank you for submission");
+      setTimeout(() => onClose(), 500);
     }
-    let result = await createReview(data)
-    if(!result.success){
-      toast.error("Error in creating review")
-      setTimeout(() => onClose() , 500);
-    }else{
-      toast.success("Thank you for submission")
-      setTimeout(() => onClose() , 500);
-    }
-  }
+  };
 
   return (
     <div
-      className="fixed flex items-center justify-center inset-0 bg-black/40 backdrop-blur-sm z-50"
+      className="fixed inset-0 flex  justify-center z-50"
       onClick={onClose}
     >
+      {/* BACKDROP */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+      {/* POPUP CARD */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="absolute top-44 w-[90%] sm:w-[420px] bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 animate-fadeIn transition-all duration-300"
-        
+        className="absolute top-36 w-[90%] sm:w-[420px] bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 animate-fadeIn transition-all duration-300"
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
@@ -50,6 +53,7 @@ const PopupCard: React.FC<IProps> = ({ onClose, productId }) => {
           </button>
         </div>
 
+        {/* Rating */}
         <div className="flex items-center space-x-1 mb-4">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -81,7 +85,8 @@ const PopupCard: React.FC<IProps> = ({ onClose, productId }) => {
             Cancel
           </button>
           <button
-            className="px-6 py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition cursor-pointer" onClick={reviewHandler}
+            className="px-6 py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition cursor-pointer"
+            onClick={reviewHandler}
           >
             Submit
           </button>

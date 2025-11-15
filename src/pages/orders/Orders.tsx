@@ -13,7 +13,7 @@ function Orders() {
 
   return (
     <MainLayout>
-      <div className="w-full min-h-screen bg-gray-100 flex justify-center items-center p-6 sm:p-10 relative">
+      <div className="w-full min-h-screen bg-gray-100 flex justify-center p-6 sm:p-10 relative">
         {popup && (
           <PopupCard
             onClose={() => setPopup(false)}

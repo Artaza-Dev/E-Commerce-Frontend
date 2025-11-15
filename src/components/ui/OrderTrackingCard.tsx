@@ -19,12 +19,12 @@ const OrderTrackingCard: React.FC<IProps> = ({ onOpen }) => {
   }, []);
 
   return (
-    <div className="w-full max-w-[900px] mx-auto bg-linear-to-br from-gray-50 to-white shadow-2xl rounded-3xl p-6 sm:p-10 border border-gray-200">
+    <div className="w-full max-w-6xl min-h-[600px]  mx-auto bg-linear-to-br from-gray-50 to-white shadow-2xl rounded-3xl p-6 sm:p-10 border border-gray-200">
       <h2 className="text-4xl font-extrabold text-center text-black bg-clip-text mb-10 tracking-tight">
         Order Tracking
       </h2>
-
-      {loading ? (
+      <div className="h-[600px] 2xl:h-[1000px] overflow-y-auto hide-scrollbar">
+         {loading ? (
         <div className="flex justify-center my-5 min-h-[400px]">
           <Loader
             type="spinner-default"
@@ -178,6 +178,7 @@ const OrderTrackingCard: React.FC<IProps> = ({ onOpen }) => {
           )}
         </>
       )}
+      </div> 
     </div>
   );
 };

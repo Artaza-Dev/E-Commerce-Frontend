@@ -1,21 +1,27 @@
-import FilterSection from "../../components/categoriesComponent/FilterSection"
-import ResultSection from "../../components/categoriesComponent/ResultSection"
-import MainLayout from "../../components/layout/MainLayout"
+import FilterSection from "../../components/categoriesComponent/FilterSection";
+import ResultSection from "../../components/categoriesComponent/ResultSection";
+import MainLayout from "../../components/layout/MainLayout";
+
 function Categories() {
   return (
-    <>
-        <MainLayout>
-      <div className="w-full min-h-screen bg-gray-100 flex flex-col lg:flex-row p-4 sm:p-6 md:p-8 gap-4">
-        {/* Filter Section (Sidebar + Mobile toggle inside it) */}
+    <div className="w-full min-h-screen bg-gray-100">
+  <MainLayout>
+    <div className="w-full px-4 lg:px-6 min-h-screen flex flex-col lg:flex-row gap-6 py-6">
+
+      {/* SIDEBAR AREA */}
+      <div className="w-full lg:w-[260px] shrink-0">
         <FilterSection />
-        {/* Result Section */}
-        <div className="flex-1">
-          <ResultSection />
-        </div>
       </div>
-    </MainLayout>
-    </>
-  )
+
+      {/* RESULTS AREA */}
+      <div className="flex-1 w-full">
+        <ResultSection />
+      </div>
+
+    </div>
+  </MainLayout>
+</div>
+  );
 }
 
-export default Categories
+export default Categories;

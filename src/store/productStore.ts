@@ -11,6 +11,7 @@ interface ProductStore {
   loading: boolean;
   productLoading: boolean;
   wishlistLoading: boolean;
+  categoryloading: boolean;
   error: string | null;
   cartItems: any[];
   categoryItems: any[];
@@ -63,6 +64,7 @@ const productStore = create<ProductStore>((set) => ({
   loading: false,
   productLoading: false,
   wishlistLoading: false,
+  categoryloading: false,
   error: null,
   message: null,
   cartItems: [],
@@ -200,14 +202,14 @@ const productStore = create<ProductStore>((set) => ({
 
   fetchProductByCategory: async (category: string) => {
     try {
-      set({ loading: true, error: null });
+      set({ categoryloading: true, error: null });
       const response = await api.get(
         `/product/getproductsbycategory/${category}`
       );
       localStorage.setItem("selectedCategory", category);
       console.log("categoryItems in store", response.data.products);
       set({
-        loading: false,
+        categoryloading: false,
         error: null,
         message: response.data.message,
         categoryItems: response.data.products || [],
@@ -220,7 +222,7 @@ const productStore = create<ProductStore>((set) => ({
       };
     } catch (error: any) {
       const message = error.response?.data?.message || "delete cart failed";
-      set({ loading: false, error: message });
+      set({ categoryloading: false, error: message });
       return { success: false, message };
     }
   },
@@ -274,28 +276,37 @@ const productStore = create<ProductStore>((set) => ({
       return { success: false, message };
     }
   },
-  applyCouponCode: async (code: string) => {
-    try {
-      set({ loading: true, error: null });
-      const response = await api.post("/coupon/applycoupon", { code });
 
-      set({
-        loading: false,
-        error: null,
-        message: response.data.message,
-        discount: response.data.discount || null,
-      });
+  applyCouponCode: async (code: string) => {
+  try {
+    set({ loading: true, error: null });
+    const response = await api.post("/coupon/applycoupon", {code} );
+    set({
+      loading: false,
+      error: null,
+      message: response.data.message,
+      discount: response.data.discount || null,
+    });
+
+     if (response.data.success) {
       return {
         success: true,
         message: response.data.message,
         data: response.data,
       };
-    } catch (error: any) {
-      const message = error.response?.data?.message || "delete cart failed";
-      set({ loading: false, error: message });
-      return { success: false, message };
+    } else {
+      return {
+        success: false,
+        message: response.data.message || "Coupon apply failed",
+      };
     }
-  },
+  } catch (error: any) {
+    const message = error.response?.data?.message || "Coupon apply failed";
+    set({ loading: false, error: message });
+    return { success: false, message };
+  }
+},
+
   createReview: async (data: any) => {
     try {
       set({ loading: true, error: null });

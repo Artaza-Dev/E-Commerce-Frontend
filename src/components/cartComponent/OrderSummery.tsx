@@ -2,15 +2,10 @@ import { Tag, ArrowRight } from "lucide-react";
 import productStore from "../../store/productStore";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-
+import { toast, ToastContainer } from "react-toastify";
 
 const OrderSummary: React.FC = () => {
-  const {
-    applyCouponCode,
-    discount,
-    cartThings
-  } = productStore();
+  const { applyCouponCode, discount, cartThings } = productStore();
   const navigate = useNavigate();
   const [code, setCode] = useState<String>("");
 
@@ -38,18 +33,19 @@ const OrderSummary: React.FC = () => {
     }
   };
   // Coupon code apply handler
-  const submitHandler = async (e: any) => {
+  const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await applyCouponCode(code as string);
-    if (result?.success) {
-      toast.success("Coupon applied successfully!");
+    if (result.success) {
+      toast.success(result.message || "Coupon applied successfully!");
     } else {
-      toast.error(result?.message || "Invalid or expired coupon code!");
+      toast.error(result.message || "Invalid or expired coupon code!");
     }
   };
 
   return (
-    <div className="w-full bg-gray-50 rounded-2xl shadow-lg p-5 sm:p-6">
+    <>
+      <div className="w-full bg-gray-50 rounded-2xl shadow-lg p-5 sm:p-6">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-5 border-b pb-3">
         Order Summary
       </h2>
@@ -115,6 +111,9 @@ const OrderSummary: React.FC = () => {
         <ArrowRight />
       </button>
     </div>
+    <ToastContainer/>
+    </>
+    
   );
 };
 

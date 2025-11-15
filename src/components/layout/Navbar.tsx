@@ -11,6 +11,8 @@ function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, logoutUser, fetchCurrentUser } = userStore();
   const { wishListProducts, cartItems } = productStore();
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
     const initializeUser = async () => {
       await fetchCurrentUser();
@@ -40,7 +42,7 @@ function Navbar() {
             {/* Logo */}
 
             <div className="text-xl sm:text-2xl font-black tracking-tighter text-black cursor-pointer">
-              <NavLink to="/">SHOP.CO</NavLink>
+              <NavLink to="/">DARAZ.LITE</NavLink>
             </div>
 
             {/* Desktop Nav Links */}
@@ -74,7 +76,7 @@ function Navbar() {
 
           {/* RIGHT SECTION */}
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 text-lg sm:text-xl">
-            {user?.email ? (
+            {token ? (
               <>
                 <NavLink
                   to="/wishlist"
@@ -187,8 +189,8 @@ function Navbar() {
           >
             Coupons
           </NavLink>
-          
-          {!user?.email && (
+
+          {!token && (
             <>
               <button className="md:hidden group relative w-44 px-5 md:px-8 py-2 bg-black text-white text-lg font-bold rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
                 <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
@@ -217,7 +219,7 @@ function Navbar() {
         {/* User menu for all screen */}
         <div
           className={`absolute top-20 right-4 bg-white w-64 shadow-lg flex flex-col space-y-4 px-4 py-2 text-sm font-medium rounded-xl overflow-hidden transition-all duration-300 ease-in-out ${
-            userMenuOpen && user?.email
+            userMenuOpen && token
               ? "max-h-64 opacity-100"
               : "max-h-0 opacity-0"
           }`}

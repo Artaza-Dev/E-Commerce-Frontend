@@ -2,6 +2,7 @@ interface ButtonProps {
   text: string;
   onclick: () => void;
   className?: string;
+  
 }
 
 const Button: React.FC<ButtonProps> = ({ text, onclick, className }) => {

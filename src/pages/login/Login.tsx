@@ -182,15 +182,6 @@ const Login: React.FC = () => {
                   <p className="text-sm text-red-600">{errors.password}</p>
                 )}
 
-                {/* ✅ Forgot Password Link */}
-                <div className="w-full flex justify-end mt-1">
-                  <NavLink
-                    to="/forgotpassword"
-                    className="text-xs sm:text-sm text-blue-700 hover:text-blue-900 font-medium cursor-pointer"
-                  >
-                    Forgot Password?
-                  </NavLink>
-                </div>
               </>
             )}
           </form>

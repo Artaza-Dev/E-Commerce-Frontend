@@ -86,9 +86,9 @@ const ItemCards: React.FC<ItemCardProps> = ({
       </div>
 
       {/* Content Section */}
-      <div className="p-5 flex flex-col justify-between h-40">
-        <div className="flex flex-col space-y-2">
-          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors duration-300">
+      <div className="p-3 flex flex-col justify-between h-40">
+        <div className="flex flex-col space-y-1">
+          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 tracking-tight group-hover:text-gray-700 transition-colors duration-300">
             {cardTitle}
           </h3>
 
@@ -102,7 +102,7 @@ const ItemCards: React.FC<ItemCardProps> = ({
         {/* Button with Animation */}
         <button
           onClick={() => navigate(`/productDetails/${productId}`)}
-          className="relative mt-4 w-full bg-linear-to-r from-gray-900 to-gray-800 text-white text-sm font-bold py-2 rounded-xl overflow-hidden group/btn transition-all duration-300 hover:from-gray-800 hover:to-gray-700 cursor-pointer"
+          className="relative mt-4 w-full bg-black text-white text-sm font-bold py-2 rounded-xl overflow-hidden group/btn transition-all duration-300 hover:from-gray-800 hover:to-gray-700 cursor-pointer"
         >
           {/* Shine Effect */}
           <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
