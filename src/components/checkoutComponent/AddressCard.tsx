@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { MapPin, Phone } from "lucide-react";
+import { MapPin, Phone, Trash } from "lucide-react";
 import addressStore from "../../store/addressStore";
 
 interface AddressCardProps {
@@ -11,14 +11,16 @@ const AddressCard: React.FC<AddressCardProps> = ({
   setAddress,
   selectedAddressId,
 }) => {
-  const { addresses, fetchaddress } = addressStore();
+  const { addresses, fetchaddress, deleteaddress } = addressStore();
 
   useEffect(() => {
     const fetchData = () => {
       fetchaddress();
     };
     fetchData();
-  }, [fetchaddress]);
+  }, [fetchaddress, addresses]);
+
+
   return (
     <>
       {addresses?.length > 0 ? (
@@ -45,7 +47,14 @@ const AddressCard: React.FC<AddressCardProps> = ({
                     Used
                   </span>
                 ) : (
-                  <> </>
+                  <>
+                    <button
+                      onClick={() => deleteaddress(val?._id)}
+                      className="transition-all text-red-500 hover:text-red-700 cursor-pointer"
+                    >
+                      <Trash size={20} />
+                    </button>
+                  </>
                 )}
               </div>
 

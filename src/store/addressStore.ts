@@ -8,6 +8,7 @@ interface AddressStore {
   error: string | null;
   message: string | null;
   fetchaddress: () => Promise<void>;
+  deleteaddress: (id: string) => Promise<void>;
   createAddress: (
     data: Address
   ) => Promise<{ success: boolean; data?: any; message?: string }>;
@@ -49,9 +50,25 @@ const addressStore = create<AddressStore>((set) => ({
         error: null,
       });
     } catch (err: any) {
+      set({ loading: false, error: err.message || "Failed to fetch address" });
+    }
+  },
+
+  deleteaddress: async (id: string) => {
+    try {
+      set({ loading: true, error: null });
+      await api.get(`/address/deleteaddress/${id}`);
+
+      set((state) => ({
+        addresses: state.addresses.filter((addr) => addr._id !== id),
+        loading: false,
+        error: null,
+      }));
+    } catch (err: any) {
       set({ loading: false, error: err.message || "Failed to fetch products" });
     }
   },
+  
 }));
 
 export default addressStore;

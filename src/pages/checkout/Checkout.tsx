@@ -98,8 +98,8 @@ const CheckoutPage: React.FC = () => {
 
     const result = await createOrder(orderData as any);
     if (result.success) {
-      toast.success("Order placed successfully!");
       productStore.setState({ cartItems: [] })
+      toast.success("Order placed successfully!");
       setTimeout(() => navigate("/ordersuccess"), 1000);
     } else {
       toast.error(result.message || "Failed to place order!");

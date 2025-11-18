@@ -108,7 +108,7 @@ function Navbar() {
 
                 <button
                   aria-label="User Account"
-                  className="p-2 hover:text-zinc-400 transition cursor-pointer"
+                  className="p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-300 cursor-pointer"
                   onClick={() => {
                     setUserMenuOpen(!userMenuOpen);
                   }}

@@ -194,12 +194,12 @@ const Login: React.FC = () => {
               onclick={signupHandler as unknown as () => void}
             />
             <p className="text-xs sm:text-sm mt-2">
-              Do you have an account?{" "}
+              If you don't have an account?{" "}
               <NavLink
                 to="/signup"
                 className="text-blue-700 font-medium cursor-pointer hover:text-zinc-800"
               >
-                Sign In
+                Sign up
               </NavLink>
             </p>
           </div>
